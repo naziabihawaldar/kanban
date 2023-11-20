@@ -74,4 +74,15 @@ class ProfileController extends Controller
             
         return response()->json($users);
     }
+    public function logout(Request $request) 
+    {
+        // Session::flush();
+        
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+        // return redirect('/login');
+    }
 }

@@ -13,6 +13,21 @@ const props = defineProps({
 var obj = {};
 // const columns = computed(() => props.board?.data?.columns);
 const columns = ref(props.board?.data?.columns);
+// const columns = computed({
+//   get() {
+//     return props.board?.data?.columns;
+//   },
+//   set(val) {
+//     console.log('**************');
+//     console.log(JSON.stringify(val));
+//     console.log('**************');
+//     // columns = val;
+//     // return ;
+//   }
+// });
+
+
+
 const boardTitle = computed(() => props.board?.data?.title);
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
@@ -26,10 +41,10 @@ const onReorderCommit = () => {
   if (!columnsWithOrder?.value?.length) {
     return;
   }
-
   router.put(route('cards.reorder'), {
     columns: columnsWithOrder.value,
   });
+  columnsWithOrder.value = [];
 };
 
 //Add Modal
@@ -116,8 +131,6 @@ const filter_query = async (query) => {
     if (response.data.length) {
       filter_items.value = response.data;
       filter_loading.value = false;
-    } else {
-      // data.message = 'Nothing found!';
     }
   }
 
@@ -175,6 +188,7 @@ function callFilterAPI(postData) {
     if (res.data.status == 'success') {
       columns.value = [];
       columns.value = res.data.data;
+      comp_columns.value = res.data.data;
       closeFilterModal();
       nextTick();
     }
@@ -352,7 +366,6 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688','#795548'];
         </div>
       </div>
     </div>
-
 
     <v-dialog width="800" v-model="addAssigneeDialog">
       <form @submit.prevent="submitAssignee">

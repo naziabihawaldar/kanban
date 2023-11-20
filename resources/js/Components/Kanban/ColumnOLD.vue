@@ -93,7 +93,6 @@ const onReorderEnds = () => {
       <MenuDropDown :menuItems="menuItems" />
     </div>
     <div class="pb-3 flex-1 flex flex-col overflow-hidden">
-      
         <div class="px-3 overflow-y-auto" ref="cardsRef">
           <Draggable v-model="cards" group="cards" item-key="id" tag="ul" drag-class="drag" ghost-class="ghost"
             class="space-y-3" @change="onReorderCards" @end="onReorderEnds">
@@ -107,7 +106,6 @@ const onReorderEnds = () => {
             <CardCreate :column="column" @created="onCardCreated" />
           </div>
         </div>
-
     </div>
   </div>
   <ConfirmDialog :show="isOpen" @confirm="closeModal($event)" title="Remove Column"

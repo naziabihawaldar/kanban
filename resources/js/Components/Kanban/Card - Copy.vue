@@ -7,7 +7,6 @@ import { TrashIcon } from '@heroicons/vue/24/solid';
 import { useEditCard } from '@/Composables/useEditCard';
 import ConfirmDialog from '@/Components/Kanban/ConfirmDialog.vue';
 import Comment from '@/Components/Kanban/Comment.vue';
-import { Logger } from 'sass';
 const props = defineProps({
   card: Object,
 });
@@ -16,10 +15,7 @@ const props = defineProps({
 const isOpen = ref(false);
 const isDialogOpen = ref(false);
 const panel = ref([0]);
-const history = ref([]);
-const emit = defineEmits(['onReloadColumns'])
-const openModal = () => (isOpen.value = true);
-const inputCardContentRef = ref();
+
 
 const closeModal = confirm => {
   isOpen.value = false;
@@ -32,13 +28,13 @@ const closeModal = confirm => {
     );
   }
 };
-
+const openModal = () => (isOpen.value = true);
 
 const form = useForm({
   content: props?.card?.content,
 });
 
-
+const inputCardContentRef = ref();
 const isEditing = computed(
   () => props?.card?.id === useEditCard?.value?.currentCard
 );
@@ -46,6 +42,7 @@ const isEditing = computed(
 const cardContent = computed(() => props.card?.content);
 const assign_users = computed(() => props.card?.users);
 const comments = computed(() => props.card?.comments);
+
 const card_id = computed(() => props.card?.id);
 const onSubmit = () => {
   form.post(
@@ -73,25 +70,23 @@ const showForm = async () => {
 };
 
 //Details
-// const openDetailModal = () => ();
-// const closeDetailModal = () => (isDialogOpen.value = false);
-const openDetailModal = () => {
-  isDialogOpen.value = true;
-  axios.post('/get-activities', {
-    card_id: card_id.value
-  }).then((res) => {
-    if (res.data.status == 'success') 
-    {
-      history.value = res.data.data;
-    }
-  }).catch((error) => {
+const openDetailModal = () => (isDialogOpen.value = true);
+const closeDetailModal = () => (isDialogOpen.value = false);
 
-  })
-};
-const closeDetailModal = () => {
-  isDialogOpen.value = false;
-  emit('onReloadColumns');
-};
+// const openDetailModal = () => {
+//   console.log("clicked");
+//   axios.post('/get-card-details', {card_id:card_id.value}).then((res) => {
+//     if(res.data.status == 'success')
+//     {
+//       isDialogOpen.value = true;
+//       // console.log(JSON.stringify(res.data.data));
+     
+//     }
+//   }).catch((error) => {
+//     // console.log(error);
+//   })
+//   // console.log(JSON.stringify());
+// };
 
 
 //Autocomplete
@@ -105,9 +100,9 @@ const select = ref(null);
 const keyword = ref('');
 const items = ref([]);
 const loading = ref(false);
-const start_date = ref((props?.card?.start_date != null) ? new Date(props?.card?.start_date) : null);
-const end_date = ref((props?.card?.end_date != null) ? new Date(props?.card?.end_date) : null);
-const due_date = ref((props?.card?.due_date != null) ? new Date(props?.card?.due_date) : null);
+const start_date = ref((props?.card?.start_date != null) ? new Date(props?.card?.start_date):null);
+const end_date = ref((props?.card?.end_date != null) ? new Date(props?.card?.end_date): null );
+const due_date = ref((props?.card?.due_date != null) ? new Date(props?.card?.due_date): null );
 
 // 
 select.value = assign_users.value[0];
@@ -160,10 +155,11 @@ watch(start_date, (value) => {
   const day = ('0' + date.getDate()).slice(-2);
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  var actual_start_date = year + '-' + month + '-' + day;
-  axios.post('/update-card-details', { type: 'start_date', date: actual_start_date, card_id: card_id.value }).then((res) => {
-    if (res.data.status == 'success') {
-
+  var actual_start_date = year+'-'+month+'-'+day;
+  axios.post('/update-card-details', {type:'start_date',date:actual_start_date,card_id:card_id.value}).then((res) => {
+    if(res.data.status == 'success')
+    {
+           
     }
   }).catch((error) => {
     // console.log(error);
@@ -174,9 +170,9 @@ watch(end_date, (value) => {
   const day = ('0' + date.getDate()).slice(-2);
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  var actual_end_date = year + '-' + month + '-' + day;
-  axios.post('/update-card-details', { type: 'end_date', date: actual_end_date, card_id: card_id.value }).then((res) => {
-    if (res.data.status == 'success') { }
+  var actual_end_date = year+'-'+month+'-'+day;
+  axios.post('/update-card-details', {type:'end_date',date:actual_end_date,card_id:card_id.value}).then((res) => {
+    if(res.data.status == 'success'){ }
   }).catch((error) => {
     // console.log(error);
   })
@@ -186,9 +182,9 @@ watch(due_date, (value) => {
   const day = ('0' + date.getDate()).slice(-2);
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  var actual_due_date = year + '-' + month + '-' + day;
-  axios.post('/update-card-details', { type: 'due_date', date: actual_due_date, card_id: card_id.value }).then((res) => {
-    if (res.data.status == 'success') { }
+  var actual_due_date = year+'-'+month+'-'+day;
+  axios.post('/update-card-details', {type:'due_date',date:actual_due_date,card_id:card_id.value}).then((res) => {
+    if(res.data.status == 'success'){ }
   }).catch((error) => {
     // console.log(error);
   })
@@ -458,9 +454,8 @@ watch(due_date, (value) => {
 
               </v-col>
               <v-col cols="12">
-
-                <Comment :cardID=card_id :allcomments="comments" :allhistory="history"/>
-              </v-col>
+                <Comment  :cardID = card_id :allcomments="comments"/>
+              </v-col> 
             </v-row>
           </v-col>
           <v-col cols="4">
@@ -483,7 +478,8 @@ watch(due_date, (value) => {
                       <b class="accent--text" style="font-size:14px">Start Date</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true" v-model="start_date">
+                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true"
+                        v-model="start_date">
                         <template v-slot:clear="{ onClear }">
                           <v-chip @click="onClear" style="color: red;left:-35px !important;">x</v-chip>
                         </template>
@@ -493,7 +489,8 @@ watch(due_date, (value) => {
                       <b class="accent--text" style="font-size:14px">End Date</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true" v-model="end_date">
+                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true"
+                        v-model="end_date">
                         <template v-slot:clear="{ onClear }">
                           <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
                         </template>
@@ -503,7 +500,8 @@ watch(due_date, (value) => {
                       <b class="accent--text" style="font-size:14px">Due Date</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true" v-model="due_date">
+                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true"
+                        v-model="due_date">
                         <template v-slot:clear="{ onClear }">
                           <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
                         </template>

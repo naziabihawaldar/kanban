@@ -13,38 +13,25 @@ const props = defineProps({
 var obj = {};
 // const columns = computed(() => props.board?.data?.columns);
 const columns = ref(props.board?.data?.columns);
-// const columns = computed({
-//   get() {
-//     return props.board?.data?.columns;
-//   },
-//   set(val) {
-//     console.log('**************');
-//     console.log(JSON.stringify(val));
-//     console.log('**************');
-//     // columns = val;
-//     // return ;
-//   }
-// });
-
-
-
 const boardTitle = computed(() => props.board?.data?.title);
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
 const columnsWithOrder = ref([]);
 
 const onReorderChange = column => {
-  columnsWithOrder.value?.push(column);
+  console.log("called inside kanban for onReorderChange"); 
+  // columnsWithOrder.value?.push(column);
 };
 
 const onReorderCommit = () => {
-  if (!columnsWithOrder?.value?.length) {
-    return;
-  }
-  router.put(route('cards.reorder'), {
-    columns: columnsWithOrder.value,
-  });
-  columnsWithOrder.value = [];
+  console.log("called inside kanban for onReorderCommit");
+  // if (!columnsWithOrder?.value?.length) {
+  //   return;
+  // }
+  // router.put(route('cards.reorder'), {
+  //   columns: columnsWithOrder.value,
+  // });
+  // columnsWithOrder.value = [];
 };
 
 //Add Modal
@@ -92,7 +79,6 @@ const submit = () => {
       snackbar_show.value = true;
       snackbar_msg.value = "successfully uploaded";
     },
-
   });
 };
 
@@ -102,6 +88,7 @@ const snackbar_show = ref('');
 const snackbar_msg = ref('');
 const chipModal = ref(false);
 const filter_cards = ref();
+const key_column = ref(true);
 
 watch(group_by_var, (value) => {
   temp_var.value = value;
@@ -260,7 +247,7 @@ function resetFilter(val) {
 
 //Add Assignee Dialog
 const addAssigneeDialog = ref(false);
-const assignee_select = ref(null);
+const assignee_select = ref(boardAssignees.value);
 const assignee_keyword = ref('');
 const assignee_items = ref([]);
 const assignee_loading = ref(false);
@@ -290,10 +277,9 @@ watch(assignee_keyword, (v) => {
 });
 const submitAssignee = () => {
   var values = assignee_select.value;
-  if (values !== null && typeof values === 'object') 
-  {
+  if (values !== null && typeof values === 'object') {
     let separatedArray = values.map(item => item['id']);
-    axios.post('/update-board-users', { assignees: separatedArray,board_id:boardID.value}).then((res) => {
+    axios.post('/update-board-users', { assignees: separatedArray, board_id: boardID.value }).then((res) => {
       if (res.data.status == 'success') {
         closeAssigneeModal();
         snackbar_show.value = true;
@@ -317,7 +303,11 @@ var getNameInitials = function (string) {
 // var color_arrays = ['#DE350B','#DE350B'];
 
 // var random = color_arrays.random();
-var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688','#795548'];
+var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688', '#795548'];
+
+const columnReload = (obj) => {
+  key_column.value = key_column.value ? false : true ;
+}
 </script>
 
 <template>
@@ -331,18 +321,20 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688','#795548'];
         <v-col cols="12" class="pl-3">
           <h1 class=" pt-3 font-bold text-xl">{{ boardTitle }}</h1>
         </v-col>
-        <v-col cols="6" align="left"  class="text-left">
+        <v-col cols="6" align="left" class="text-left">
           <div class="ml-6 text-lg-left left-1">
             <template v-for="boardAssignee in boardAssignees" :key="boardAssignee.id">
-              <v-avatar :color="colors[Math.floor(Math.random() * colors.length)]" class="mr-1" style="width: 32px;height: 32px;font-size: 14px;margin-left: -10px;">
+              <v-avatar :color="colors[Math.floor(Math.random() * colors.length)]" class="mr-1"
+                style="width: 32px;height: 32px;font-size: 14px;margin-left: -10px;">
                 {{ getNameInitials(boardAssignee.name) }}
               </v-avatar>
             </template>
-            <v-btn class="ma-2" style="width: 32px;height: 32px;font-size: 14px;" color="indigo" icon="mdi mdi-account-plus-outline" @click="openAssigneeModal"></v-btn>
+            <v-btn class="ma-2" style="width: 32px;height: 32px;font-size: 14px;" color="indigo"
+              icon="mdi mdi-account-plus-outline" @click="openAssigneeModal"></v-btn>
           </div>
         </v-col>
         <v-col cols="6" align="right" class="text-right">
-          <v-btn size="small" color="primary" @click="openModal">Import</v-btn>
+          <v-btn  v-if="!is('user')" size="small" color="primary" @click="openModal">Import</v-btn>
           <v-btn style="font-size: 22px;" size="small" @click="openFilterModal" class="ma-2" variant="text"
             icon="mdi mdi-filter-variant  " color="black-lighten-4"></v-btn>
         </v-col>
@@ -358,15 +350,17 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688','#795548'];
     <div class="pl-5 pr-5 flex-1 flex flex-col h-full overflow-hidden">
       <div class="flex-1 h-full overflow-x-auto">
         <div class="inline-flex h-full items-start space-x-4 overflow-hidden">
-          <Column v-for="column in columns" :key="temp_var" :column="column" @reorder-change="onReorderChange"
-            @reorder-commit="onReorderCommit" />
+
+          <Column :boardId=boardID :key="key_column"/>
+          <!-- <Column v-for="column in columns" :key="temp_var" :column="column" @reorder-change="onReorderChange"
+            @reorder-commit="onReorderCommit" /> -->
           <div class="w-72">
-            <ColumnCreate :board="board.data" />
+            <ColumnCreate :board="board.data" @onColoumnCreated="columnReload" @reorder-change="onReorderChange"
+            @reorder-commit="onReorderCommit" />
           </div>
         </div>
       </div>
     </div>
-
 
     <v-dialog width="800" v-model="addAssigneeDialog">
       <form @submit.prevent="submitAssignee">
@@ -374,9 +368,8 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688','#795548'];
           <v-card-text>
             <v-row no-gutters>
               <v-col cols="12">
-                
                 <div>
-                  <InputLabel for="name" value="AssigneeName" />
+                  <InputLabel for="name" value="Assignee Name" />
                   <v-combobox outlined clearable multiple chips color="green" v-model:search="assignee_keyword" no-filter
                     v-model="assignee_select" :items="assignee_items" :loading="assignee_loading" item-title="name"
                     item-value="id" @focus="() => assignee_query(keyword)" />
@@ -400,7 +393,7 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688','#795548'];
             <v-row no-gutters>
               <v-col cols="5" class="mr-3">
                 <div>
-                  <InputLabel for="name" value="AssigneeName" />
+                  <InputLabel for="name" value="Assignee Name" />
                   <v-combobox outlined clearable chips color="green " v-model:search="filter_keyword" no-filter
                     v-model="filter_select" :items="filter_items" :loading="filter_loading" item-title="name"
                     item-value="id" @focus="() => filter_query(keyword)" />

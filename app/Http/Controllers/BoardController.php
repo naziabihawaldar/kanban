@@ -186,7 +186,20 @@ class BoardController extends Controller
             }
         }
         return ['status'=> 'error occurred'];
-        
-
+    }
+    public function getColumns(Request $request)
+    {
+        try 
+        {
+            $board = Board::find($request->board_id);
+            if($board)
+            { 
+                $columns = $board->columns()->with('cards','cards.users','cards.comments','cards.comments.user')->get();
+                return ['status' => 'success','data'=> $columns];
+            }
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status'=> 'error'];
+        }
     }
 }

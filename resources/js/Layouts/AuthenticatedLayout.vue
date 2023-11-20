@@ -12,7 +12,7 @@ const showingNavigationDropdown = ref(false);
 </script>
 
 <template>
-  <div class="h-screen bg-gray-100 flex flex-col">
+  <div class="h-screen flex flex-col">
     <nav class="bg-white border-b border-gray-100">
       <!-- Primary Navigation Menu -->
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,6 +40,12 @@ const showingNavigationDropdown = ref(false);
                 :active="route().current('boards')"
               >
                 Kanban
+              </NavLink>
+              <NavLink
+                :href="route('reports')"
+                :active="route().current('boards')"
+              >
+                Reports
               </NavLink>
             </div>
           </div>
@@ -77,7 +83,7 @@ const showingNavigationDropdown = ref(false);
                     Profile
                   </DropdownLink>
                   <DropdownLink
-                    :href="route('logout')"
+                    :href="route('user.logout')"
                     method="post"
                     as="button"
                   >
@@ -184,7 +190,7 @@ const showingNavigationDropdown = ref(false);
     </header>
 
     <!-- Page Content -->
-    <main class="flex-1 flex flex-col overflow-hidden">
+    <main class="flex-1 flex flex-col">
       
       <slot />
     </main>

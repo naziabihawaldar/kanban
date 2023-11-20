@@ -1,5 +1,5 @@
 const Ziggy = {
-  url: 'http://localhost:8081',
+  url: 'http://localhost:8000',
   port: 8081,
   defaults: {},
   routes: {
@@ -94,6 +94,8 @@ const Ziggy = {
     'password.confirm': { uri: 'confirm-password', methods: ['GET', 'HEAD'] },
     'password.update': { uri: 'password', methods: ['PUT'] },
     logout: { uri: 'logout', methods: ['POST'] },
+    'user.logout': { uri: 'user/logout', methods: ['POST'] },
+    reports: { uri: 'reports', methods: ['POST'] },
   },
 };
 

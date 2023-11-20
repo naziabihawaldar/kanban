@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\ColumnDestroyController;
 use App\Http\Controllers\BoardColumnCreateController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,16 +62,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/columns/{column}/cards/{card}', ColumnCardDestroyController::class)
         ->scopeBindings()->name('columns.cards.destroy');
 
-    Route::put('/cards/reorder', CardsReorderUpdateController::class)
+    // Route::put('/cards/reorder', CardsReorderUpdateController::class)
+    //     ->name('cards.reorder');
+    Route::put('/cards/reorder', [CardsReorderUpdateController::class,'cardReorder'])
         ->name('cards.reorder');
 
     Route::get('/boards-list', [BoardController::class, 'index'])->name('boards.list');
-    Route::post('assign-card', [CardController::class, 'assignCardToUser'])
-        ->name('assign.card');
+    Route::post('assign-card', [CardController::class, 'assignCardToUser'])->name('assign.card');
 
     Route::post('upload-board', [CardController::class, 'importBoardData'])->name('uploadBoard');
     Route::post('/add-comments', [CommentController::class, 'storeComment'])->name('storeComment');
     Route::post('/get-card-details', [CardController::class, 'getCardDetails']);
+    Route::get('/get-columns', [BoardController::class, 'getColumns']);
+    Route::post('/get-activities', [CardController::class, 'getActivities']);
+
+    Route::get('/reports', [ReportController::class, 'index']);
 
 });
 
@@ -79,6 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('search-user', [ProfileController::class, 'searchUser']);
+    Route::post('/user/logout', [ProfileController::class, 'logout'])->name('logout');
 });
 
 require __DIR__ . '/auth.php';

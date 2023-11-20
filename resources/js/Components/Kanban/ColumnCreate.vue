@@ -3,6 +3,8 @@ import { nextTick, ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
 import { PlusIcon } from '@heroicons/vue/24/solid';
 
+const emit = defineEmits(['onColoumnCreated'])
+
 const props = defineProps({
   board: Object,
 });
@@ -19,6 +21,8 @@ const onSubmit = () => {
     onSuccess: () => {
       form.reset();
       isCreating.value = false;
+      const  obj = {}
+      emit('onColoumnCreated', obj)
     },
   });
 };

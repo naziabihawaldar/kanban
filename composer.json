@@ -9,6 +9,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.1",
+    "ahmedsaoud31/laravel-permission-to-vuejs": "dev-master",
     "guzzlehttp/guzzle": "^7.2",
     "inertiajs/inertia-laravel": "^0.6.8",
     "laravel/framework": "^10.0",
@@ -16,6 +17,7 @@
     "laravel/tinker": "^2.8",
     "maatwebsite/excel": "^3.1",
     "spatie/laravel-activitylog": "^4.7",
+    "spatie/laravel-permission": "^6.1",
     "tightenco/ziggy": "^1.0"
   },
   "require-dev": {

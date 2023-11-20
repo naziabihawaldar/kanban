@@ -10,6 +10,7 @@ use Auth;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Spatie\Permission\Models\Role;
 
 class CardsImport implements ToModel, WithHeadingRow
 {
@@ -90,6 +91,8 @@ class CardsImport implements ToModel, WithHeadingRow
                     $user->namee = $row['assignee_name'];
                     $user->email = $row['assignee_email'];
                     $user->save();
+                    $role = Role::find(3);
+                    $user->assignRole($role);
                 }
                 $newRecord->users()->sync([$user->id]);
 

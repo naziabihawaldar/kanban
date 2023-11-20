@@ -12,6 +12,9 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import LaravelPermissionToVueJS from 'laravel-permission-to-vuejs'
+import Vue3EasyDataTable from 'vue3-easy-data-table';
+import 'vue3-easy-data-table/dist/style.css';
 
 const vuetify = createVuetify({
   components,
@@ -33,6 +36,8 @@ createInertiaApp({
       .use(plugin)
       .use(ZiggyVue, Ziggy)
       .use(vuetify)
+      .use(LaravelPermissionToVueJS)
+      .use(Vue3EasyDataTable)
       .mount(el);
   },
   progress: {

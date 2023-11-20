@@ -45,6 +45,11 @@ class CardController extends Controller
             if($user)
             {
                 $card->users()->sync([$request->user_id]);
+                $board = Board::find($card->board_id);
+                if($board)
+                {
+                    $board->assignees()->attach($user);
+                }
                 $mailData = [
                     'username' => $user->name,
                     'taskTitle' => $card->content,
@@ -79,6 +84,19 @@ class CardController extends Controller
                 return ['status' => 'success','message' =>'success','data' => $card];
             }
         } catch (\Exception $e) {
+            logger($e);
+            return ['status'=> 'error','message'=> 'Error Occurred'];
+        }
+    }
+
+    public function getActivities(Request $request)
+    {
+        try
+        {
+            $card = new Card; 
+            $activities = Activity::with('causer')->where('subject_id',$request->card_id)->orderByDesc('created_at')->get();
+            return ['status'=> 'success','message'=> 'success','data'=> $activities];
+        }catch (\Exception $e) {
             logger($e);
             return ['status'=> 'error','message'=> 'Error Occurred'];
         }

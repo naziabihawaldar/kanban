@@ -6,11 +6,11 @@ use App\Models\Comment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Models\Activity;
 
 class Card extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'content',
         'column_id',
@@ -33,5 +33,18 @@ class Card extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class)->latest();
-    }   
+    }
+    
+    public function history()
+    {
+        // $card = new Card;
+        // $activities = Activity::where('subject_type',get_class($card))->get();
+        // logger($activities);
+        return 123;
+    }
+
+    public function historyO()
+    {
+        return $this->hasMany(Activity::class,'');
+    }
 }
