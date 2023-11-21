@@ -36,8 +36,8 @@ const showingNavigationDropdown = ref(false);
                 Dashboard
               </NavLink>
               <NavLink
-                :href="route('boards')"
-                :active="route().current('boards')"
+                :href="route('boards-list')"
+                :active="route().current('boards-list')"
               >
                 Kanban
               </NavLink>

@@ -1,5 +1,5 @@
 const Ziggy = {
-  url: 'https://tms.hoshey.com',
+  url: 'http://localhost:8000',
   port: 8081,
   defaults: {},
   routes: {
@@ -38,6 +38,7 @@ const Ziggy = {
     },
     dashboard: { uri: 'dashboard', methods: ['GET', 'HEAD'] },
     boards: { uri: 'boards', methods: ['GET', 'HEAD'] },
+    'boards-list': { uri: 'boards-list', methods: ['GET', 'HEAD'] },
     'boards.columns.store': {
       uri: 'boards/{board}/columns',
       methods: ['POST'],

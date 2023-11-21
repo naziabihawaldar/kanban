@@ -33,7 +33,6 @@ const closeModal = confirm => {
   }
 };
 
-
 const form = useForm({
   content: props?.card?.content,
 });
@@ -222,7 +221,6 @@ watch(due_date, (value) => {
             {{ getInitials(user.name) }}
           </v-avatar>
         </template>
-
       </div>
       <div class="hidden absolute right-1 inset-0 group-hover:flex justify-end space-x-2 items-center">
         <button @click.prevent="showForm"
@@ -455,10 +453,8 @@ watch(due_date, (value) => {
                   <v-col cols="6" class="pa-0"><b class="accent--text">THS_VLAN4 Subnet :</b></v-col>
                   <v-col cols="6" class="pa-0">{{ card.THS_VLAN4_Subnet }}</v-col>
                 </v-row>
-
               </v-col>
               <v-col cols="12">
-
                 <Comment :cardID=card_id :allcomments="comments" :allhistory="history"/>
               </v-col>
             </v-row>
@@ -474,7 +470,6 @@ watch(due_date, (value) => {
                       <b class="accent--text" style="font-size:14px">Assignee</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-
                       <v-combobox outlined clearable chips color="green " v-model:search="keyword" no-filter
                         v-model="select" :items="items" :loading="loading" item-title="name" item-value="id" return-object
                         @focus="() => query(keyword)" />

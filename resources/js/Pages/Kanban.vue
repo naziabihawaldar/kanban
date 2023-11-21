@@ -19,7 +19,7 @@ const boardAssignees = computed(() => props.board?.data?.board_assignees);
 const columnsWithOrder = ref([]);
 
 const onReorderChange = column => {
-  console.log("called inside kanban for onReorderChange"); 
+  console.log("called inside kanban for onReorderChange");
   // columnsWithOrder.value?.push(column);
 };
 
@@ -75,9 +75,11 @@ const submit = () => {
   form.post('/upload-board', {
     onFinish: () => {
       form.reset('file');
+      form.file = [];
       myDialog.value = false;
       snackbar_show.value = true;
       snackbar_msg.value = "successfully uploaded";
+      key_column.value = key_column.value ? false : true;
     },
   });
 };
@@ -306,7 +308,7 @@ var getNameInitials = function (string) {
 var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688', '#795548'];
 
 const columnReload = (obj) => {
-  key_column.value = key_column.value ? false : true ;
+  key_column.value = key_column.value ? false : true;
 }
 </script>
 
@@ -334,7 +336,7 @@ const columnReload = (obj) => {
           </div>
         </v-col>
         <v-col cols="6" align="right" class="text-right">
-          <v-btn  v-if="!is('user')" size="small" color="primary" @click="openModal">Import</v-btn>
+          <v-btn v-if="!is('user')" size="small" color="primary" @click="openModal">Import</v-btn>
           <v-btn style="font-size: 22px;" size="small" @click="openFilterModal" class="ma-2" variant="text"
             icon="mdi mdi-filter-variant  " color="black-lighten-4"></v-btn>
         </v-col>
@@ -351,12 +353,12 @@ const columnReload = (obj) => {
       <div class="flex-1 h-full overflow-x-auto">
         <div class="inline-flex h-full items-start space-x-4 overflow-hidden">
 
-          <Column :boardId=boardID :key="key_column"/>
+          <Column :boardId=boardID :key="key_column" />
           <!-- <Column v-for="column in columns" :key="temp_var" :column="column" @reorder-change="onReorderChange"
             @reorder-commit="onReorderCommit" /> -->
           <div class="w-72">
             <ColumnCreate :board="board.data" @onColoumnCreated="columnReload" @reorder-change="onReorderChange"
-            @reorder-commit="onReorderCommit" />
+              @reorder-commit="onReorderCommit" />
           </div>
         </div>
       </div>
@@ -468,13 +470,18 @@ const columnReload = (obj) => {
       <v-card>
         <form @submit.prevent="submit">
           <v-card title="Import">
-            <v-card-text>
+            <v-card-text class="pb-0"> 
               <v-file-input v-model="form.file" prepend-icon="mdi-camera" variant="outlined" label="File input"
                 density="compact"></v-file-input>
               <progress v-if="form.progress" :value="form.progress.percentage" max="100">{{ form.progress.percentage
               }}%</progress>
+
+              <div style="text-align: right;color:blue;">
+                <a href="/import.xlsx" download>Download Sample Template</a>
+              </div>
+
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions class="pt-0">
               <v-spacer></v-spacer>
               <v-btn size="small" text="Close" @click="closeModal"></v-btn>
               <v-btn size="small" text="Submit" type="submit"></v-btn>

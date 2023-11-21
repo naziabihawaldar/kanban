@@ -27,6 +27,8 @@ class CardsImport implements ToModel, WithHeadingRow
     }
     public function model(array $row)
     {      
+        logger($row);
+
         $board_id = $this->boardId;  
         $board = Board::find($board_id);
         if($board)
@@ -84,12 +86,13 @@ class CardsImport implements ToModel, WithHeadingRow
                 $newRecord->due_date = \Carbon\Carbon::parse($row['due_date'])->format('Y-m-d');   // Assuming you want the current date and time
                 $newRecord->created_by = Auth::id();
                 $newRecord->save();
-                $user = User::where('email',$row['assignee_email'])->first();
+                $user = User::where('email',$row['assigned_by_email'])->first();
                 if(!$user) 
                 {
                     $user = new User;
-                    $user->namee = $row['assignee_name'];
-                    $user->email = $row['assignee_email'];
+                    $user->name = $row['assigned_by_name'];
+                    $user->email = $row['assigned_by_email'];
+                    $user->password = bcrypt('password');
                     $user->save();
                     $role = Role::find(3);
                     $user->assignRole($role);
