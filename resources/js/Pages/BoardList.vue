@@ -10,7 +10,7 @@
                 </v-col>
                 <v-col cols="4" align="right">
                     <v-spacer></v-spacer>
-                    <v-btn size="small" color="primary" @click="openAddModal">Add Board</v-btn>
+                    <v-btn  v-if="$page.props.auth.user.roles[0].name != 'user'" size="small" color="primary" @click="openAddModal">Add Board</v-btn>
                 </v-col>
                 <v-col cols="12" class="mt-3">
                     <v-table>

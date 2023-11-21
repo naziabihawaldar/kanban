@@ -21,6 +21,7 @@ const vuetify = createVuetify({
   directives,
 })
 
+
 const appName =
   window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 

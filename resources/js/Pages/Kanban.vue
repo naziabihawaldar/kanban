@@ -336,7 +336,7 @@ const columnReload = (obj) => {
           </div>
         </v-col>
         <v-col cols="6" align="right" class="text-right">
-          <v-btn v-if="!is('user')" size="small" color="primary" @click="openModal">Import</v-btn>
+          <v-btn v-if="$page.props.auth.user.roles[0].name != 'user'" size="small" color="primary" @click="openModal">Import</v-btn>
           <v-btn style="font-size: 22px;" size="small" @click="openFilterModal" class="ma-2" variant="text"
             icon="mdi mdi-filter-variant  " color="black-lighten-4"></v-btn>
         </v-col>
