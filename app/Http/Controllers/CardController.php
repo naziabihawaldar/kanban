@@ -7,8 +7,9 @@ use App\Models\Card;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Excel;
 use Spatie\Activitylog\Models\Activity;
+use App\Imports\CardsImport;
+use Maatwebsite\Excel\Facades\Excel; 
 
 class CardController extends Controller
 {
@@ -20,9 +21,11 @@ class CardController extends Controller
             if ($file === null) {
                 logger("Invalid file");
             } else {
-                $path = $file[0]->getRealPath();
+                // $path = $file[0]->getRealPath();
                 // $filePath = $file[0]->getPathname();
-                \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\CardsImport($board_id), $path);
+                // \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\CardsImport($board_id), $path);
+                $data = Excel::import(new CardsImport($board_id),$file[0]);
+
                 $board = Board::find($board_id);
 
                 activity('create')
