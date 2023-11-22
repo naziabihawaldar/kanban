@@ -161,9 +161,9 @@ var formatDueDate = function(dueDate){
   const inputDate = new Date(dueDate);
   if(currentDate > inputDate)
   {
-    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-danger, #FFEBE6);color:var(--ds-text-accent-red, #DE350B)"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
+    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-danger, #FFEBE6);color:var(--ds-text-accent-red, #DE350B)"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
   }else{
-    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-neutral, #F4F5F7);color:var(--ds-text-subtle, #42526E);"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
+    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-neutral, #F4F5F7);color:var(--ds-text-subtle, #42526E);"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
     
   }
   // console.log(result);
