@@ -353,7 +353,7 @@ const columnReload = (obj) => {
       <div class="flex-1 h-full overflow-x-auto">
         <div class="inline-flex h-full items-start space-x-4 overflow-hidden">
 
-          <Column :boardId=boardID :key="key_column" />
+          <Column :boardId=boardID :boardtitle="boardTitle" :key="key_column" />
           <!-- <Column v-for="column in columns" :key="temp_var" :column="column" @reorder-change="onReorderChange"
             @reorder-commit="onReorderCommit" /> -->
           <div class="w-72">

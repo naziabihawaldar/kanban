@@ -11,10 +11,12 @@ import { Logger } from 'sass';
 import moment from 'moment';
 const props = defineProps({
   card: Object,
+  boardTitle: String,
 });
-// console.log(props?.card?.users);
+// console.log(props?.card?.board);
 // TODO: Move to composable useModal
 const isOpen = ref(false);
+const board_title = ref(props.boardTitle);
 const isDialogOpen = ref(false);
 const panel = ref([0]);
 const history = ref([]);
@@ -155,6 +157,18 @@ var getInitials = function (string) {
   return initials;
 };
 
+var padZeros = function(number, length){
+  var str = '' + number;
+  while (str.length < length) {
+    str = '0' + str;
+  }
+  return str;
+};
+var formatTaskID = function(ID){
+  var spanHTML = '';
+  spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;color:var(--ds-text-subtle,#7a869a);font-weight: 600;font-size: 10pt;line-height:10px"><span class="mdi mdi-checkbox-marked" style="font-size:20px;font-weight:700;padding-right:5px;color:#4BADE8;vertical-align:top;"></span>'+getInitials(board_title.value)+''+padZeros(ID,4)+'</div>';
+  return spanHTML;
+};
 var formatDueDate = function(dueDate){
   var spanHTML = '';
   const currentDate = new Date();
@@ -166,7 +180,6 @@ var formatDueDate = function(dueDate){
     spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-neutral, #F4F5F7);color:var(--ds-text-subtle, #42526E);"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
     
   }
-  // console.log(result);
   return spanHTML;
 };
 watch(start_date, (value) => {
@@ -231,11 +244,14 @@ watch(due_date, (value) => {
     <div v-else>
       <p class="text-sm">{{ cardContent }}</p>
       <v-row>
-        <v-col>
+        <v-col cols="12" class="pa-0 pt-2 pl-2">
           <div class="text-lg-left left-1 pt-2" style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: center;" v-html="formatDueDate(card.due_date)">
           </div>
         </v-col>
-        <v-col >
+        <v-col cols="6" class="pa-0 pl-2">
+          <div class="text-lg-left left-1 pt-2" v-html="formatTaskID(card.id)"></div>
+        </v-col>
+        <v-col cols="6">
           <div class="text-lg-right right-1">
             <template v-for="user in assign_users" :key="user.id">
               <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;">

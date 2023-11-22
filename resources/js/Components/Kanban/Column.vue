@@ -9,11 +9,13 @@ import ConfirmDialog from '@/Components/Kanban/ConfirmDialog.vue';
 import MenuDropDown from '@/Components/Kanban/MenuDropDown.vue';
 
 const props = defineProps({
-    boardId: Number
+    boardId: Number,
+    boardtitle: String,
 });
 const emit = defineEmits(['reorder-commit', 'reorder-change']);
 const isOpen = ref(false);
 const board_id = ref(props.boardId);
+const board_title = ref(props.boardtitle);
 const openModal = () => (isOpen.value = true);
 const columns = ref([]);
 const cards = ref([]);
@@ -85,7 +87,7 @@ const reloadColumns = (obj) => {
                         class="space-y-3" @change="onReorderCards($event,column.id)" @end="onReorderEnds($event)">
                         <template #item="{ element }">
                         <li>
-                            <Card :card="element" @onReloadColumns="reloadColumns"/>
+                            <Card :boardTitle="board_title" :card="element" @onReloadColumns="reloadColumns"/>
                         </li>
                         </template>
                     </Draggable>
