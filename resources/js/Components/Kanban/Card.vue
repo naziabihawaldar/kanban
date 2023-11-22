@@ -8,6 +8,7 @@ import { useEditCard } from '@/Composables/useEditCard';
 import ConfirmDialog from '@/Components/Kanban/ConfirmDialog.vue';
 import Comment from '@/Components/Kanban/Comment.vue';
 import { Logger } from 'sass';
+import moment from 'moment';
 const props = defineProps({
   card: Object,
 });
@@ -79,8 +80,7 @@ const openDetailModal = () => {
   axios.post('/get-activities', {
     card_id: card_id.value
   }).then((res) => {
-    if (res.data.status == 'success') 
-    {
+    if (res.data.status == 'success') {
       history.value = res.data.data;
     }
   }).catch((error) => {
@@ -154,6 +154,21 @@ var getInitials = function (string) {
   }
   return initials;
 };
+
+var formatDueDate = function(dueDate){
+  var spanHTML = '';
+  const currentDate = new Date();
+  const inputDate = new Date(dueDate);
+  if(currentDate > inputDate)
+  {
+    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-danger, #FFEBE6);color:var(--ds-text-accent-red, #DE350B)"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
+  }else{
+    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-neutral, #F4F5F7);color:var(--ds-text-subtle, #42526E);"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
+    
+  }
+  // console.log(result);
+  return spanHTML;
+};
 watch(start_date, (value) => {
   var date = new Date(value);
   const day = ('0' + date.getDate()).slice(-2);
@@ -215,13 +230,21 @@ watch(due_date, (value) => {
     </form>
     <div v-else>
       <p class="text-sm">{{ cardContent }}</p>
-      <div class="mt-2 text-lg-right right-1">
-        <template v-for="user in assign_users" :key="user.id">
-          <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;">
-            {{ getInitials(user.name) }}
-          </v-avatar>
-        </template>
-      </div>
+      <v-row>
+        <v-col>
+          <div class="text-lg-left left-1 pt-2" style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: center;" v-html="formatDueDate(card.due_date)">
+          </div>
+        </v-col>
+        <v-col >
+          <div class="text-lg-right right-1">
+            <template v-for="user in assign_users" :key="user.id">
+              <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;">
+                {{ getInitials(user.name) }}
+              </v-avatar>
+            </template>
+          </div>
+        </v-col>
+      </v-row>
       <div class="hidden absolute right-1 inset-0 group-hover:flex justify-end space-x-2 items-center">
         <button @click.prevent="showForm"
           class="w-8 h-8 bg-gray-50 text-gray-600 hover:text-black hover:bg-gray-200 rounded-md grid place-content-center">
@@ -455,7 +478,7 @@ watch(due_date, (value) => {
                 </v-row>
               </v-col>
               <v-col cols="12">
-                <Comment :cardID=card_id :allcomments="comments" :allhistory="history"/>
+                <Comment :cardID=card_id :allcomments="comments" :allhistory="history" />
               </v-col>
             </v-row>
           </v-col>

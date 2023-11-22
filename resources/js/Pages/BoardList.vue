@@ -94,7 +94,7 @@ const submit = () => {
             form.reset('title');
             addBoardDialog.value = false;
             snackbar_show.value = true;
-            snackbar_msg.value = "successfully uploaded";
+            snackbar_msg.value = "A new board successfully added";
         },
 
     });

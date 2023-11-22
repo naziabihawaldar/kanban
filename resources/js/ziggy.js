@@ -1,5 +1,5 @@
 const Ziggy = {
-  url: 'https://tms.hoshey.com',
+  url: 'http://localhost:8000',
   port: 8081,
   defaults: {},
   routes: {
