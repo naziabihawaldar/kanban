@@ -82,7 +82,7 @@ class ReportExport implements FromCollection, WithHeadings , WithMapping , WithS
             $card->vulnerability_title,
             $card->vulnerability_id,
             $card->vulnerability_desc,
-            $card->board->title,
+            optional($card->board)->title,
             optional($assigned_to)->name,
             $start_date,
             $end_date,
