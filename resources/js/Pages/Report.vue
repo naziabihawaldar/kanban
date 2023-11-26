@@ -123,13 +123,12 @@ const download = (data, file_name) => {
                         item-value="name" @update:options="loadItems">
                         <template v-slot:item="item">
                             <tr>
-                                <td><span v-if="item.item.vulnerability_title !=''" >{{
-                                    truncatedString(item.item.vulnerability_title) }}</span></td>
+                                <td><span v-if="item.item.vulnerability_title != ''">{{ truncatedString(item.item.vulnerability_title) }}</span></td>
                                 <td><span v-if="item.item.vulnerability_id != ''">{{ truncatedString(
                                     item.item.vulnerability_id) }}</span></td>
                                 <td><span v-if="item.item.vulnerability_desc != ''">{{ truncatedString(
                                     item.item.vulnerability_desc) }}</span></td>
-                                <td> <span v-if="item.item.board != ''">{{ item.item.board.title }}</span> </td>
+                                <td> <span v-if="item.item.board">{{ item.item.board.title }}</span> </td>
                                 <td> <span v-if="item.item.users.length > 0">{{ item.item.users[0].name }}</span><span
                                         v-else> - </span> </td>
                                 <td> <span v-if="moment(item.item.start_date).isValid()">{{
