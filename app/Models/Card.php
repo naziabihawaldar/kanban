@@ -35,16 +35,4 @@ class Card extends Model
         return $this->hasMany(Comment::class)->latest();
     }
     
-    public function history()
-    {
-        // $card = new Card;
-        // $activities = Activity::where('subject_type',get_class($card))->get();
-        // logger($activities);
-        return 123;
-    }
-
-    public function historyO()
-    {
-        return $this->hasMany(Activity::class,'');
-    }
 }

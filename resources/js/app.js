@@ -10,13 +10,18 @@ import { Ziggy } from './ziggy';
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
+import { components as labsComponents } from 'vuetify/dist/vuetify-labs.js'
+// import { VDataTable } from 'vuetify/labs/VDataTable'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import LaravelPermissionToVueJS from 'laravel-permission-to-vuejs'
-import Vue3EasyDataTable from 'vue3-easy-data-table';
-import 'vue3-easy-data-table/dist/style.css';
+import LaravelPermissionToVueJS from 'laravel-permission-to-vuejs';
+// import Vue3EasyDataTable from 'vue3-easy-data-table';
+// import 'vue3-easy-data-table/dist/style.css';
 
 const vuetify = createVuetify({
+  components: {
+    labsComponents,
+  },
   components,
   directives,
 })
@@ -38,7 +43,7 @@ createInertiaApp({
       .use(ZiggyVue, Ziggy)
       .use(vuetify)
       .use(LaravelPermissionToVueJS)
-      .use(Vue3EasyDataTable)
+      // .use(Vue3EasyDataTable)
       .mount(el);
   },
   progress: {

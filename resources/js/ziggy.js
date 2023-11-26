@@ -1,6 +1,6 @@
 const Ziggy = {
-  // url: 'http://localhost:8000',
-  url: 'https://tms.hoshey.com',
+  url: 'http://localhost:8000',
+  // url: 'https://tms.hoshey.com',
   port: 8081,
   defaults: {},
   routes: {

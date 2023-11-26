@@ -79,6 +79,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/get-activities', [CardController::class, 'getActivities']);
 
     Route::get('/reports', [ReportController::class, 'index']);
+    Route::get('/get-reports', [ReportController::class, 'getReportsData']);
+    Route::post('/reports/export', [ReportController::class, 'export']);
 
 });
 
