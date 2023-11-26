@@ -123,13 +123,13 @@ const download = (data, file_name) => {
                         item-value="name" @update:options="loadItems">
                         <template v-slot:item="item">
                             <tr>
-                                <td><span>{{
+                                <td><span v-if="item.item.vulnerability_title !=''" >{{
                                     truncatedString(item.item.vulnerability_title) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.vulnerability_id != ''">{{ truncatedString(
                                     item.item.vulnerability_id) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.vulnerability_desc != ''">{{ truncatedString(
                                     item.item.vulnerability_desc) }}</span></td>
-                                <td> {{ item.item.board.title }}</td>
+                                <td> <span v-if="item.item.board != ''">{{ item.item.board.title }}</span> </td>
                                 <td> <span v-if="item.item.users.length > 0">{{ item.item.users[0].name }}</span><span
                                         v-else> - </span> </td>
                                 <td> <span v-if="moment(item.item.start_date).isValid()">{{
@@ -139,75 +139,75 @@ const download = (data, file_name) => {
                                     moment(item.item.end_date).format('D MMM YY') }}</span><span v-else> - </span></td>
                                 <td><span v-if="moment(item.item.due_date).isValid()">{{
                                     moment(item.item.due_date).format('D MMM YY') }}</span><span v-else> - </span></td>
-                                <td><span>{{ truncatedString(item.item.asset_ip) }}</span>
+                                <td><span v-if="item.item.asset_ip != ''">{{ truncatedString(item.item.asset_ip) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.ip_and_vuln_id != ''">{{ truncatedString(
                                     item.item.ip_and_vuln_id) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.port) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.protocol) }}</span>
+                                <td><span v-if="item.item.port != ''">{{ truncatedString(item.item.port) }}</span></td>
+                                <td><span v-if="item.item.protocol != ''">{{ truncatedString(item.item.protocol) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(item.item.os_type) }}</span>
+                                <td><span v-if="item.item.os_type != ''">{{ truncatedString(item.item.os_type) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.os_version != ''">{{ truncatedString(
                                     item.item.os_version) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.business_unit != ''">{{ truncatedString(
                                     item.item.business_unit) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.class) }}</span>
+                                <td><span v-if="item.item.class != ''">{{ truncatedString(item.item.class) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(item.item.cve_id) }}</span>
+                                <td><span v-if="item.item.cve_id != ''">{{ truncatedString(item.item.cve_id) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.cvss_score != ''">{{ truncatedString(
                                     item.item.cvss_score) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.severity) }}</span>
+                                <td><span  v-if="item.item.severity != ''">{{ truncatedString(item.item.severity) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(item.item.solution) }}</span>
+                                <td><span v-if="item.item.solution != ''">{{ truncatedString(item.item.solution) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.impact_of_vulnerability != ''">{{ truncatedString(
                                     item.item.impact_of_vulnerability) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.scan_date_time != ''">{{ truncatedString(
                                     item.item.scan_date_time) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.background != ''">{{ truncatedString(
                                     item.item.background) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.service) }}</span>
+                                <td><span v-if="item.item.service != ''" >{{ truncatedString(item.item.service) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.remediation != ''" >{{ truncatedString(
                                     item.item.remediation) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.references != ''">{{ truncatedString(
                                     item.item.references) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.exception) }}</span>
+                                <td><span v-if="item.item.exception != ''">{{ truncatedString(item.item.exception) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(item.item.tags) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.tags != ''">{{ truncatedString(item.item.tags) }}</span></td>
+                                <td><span v-if="item.item.asset_version != ''">{{ truncatedString(
                                     item.item.asset_version) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.model) }}</span>
+                                <td><span v-if="item.item.model != ''">{{ truncatedString(item.item.model) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(item.item.make) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.asset_type) }}</span></td>
-                                <td><span>{{ truncatedString(item.item.host_name) }}</span>
+                                <td><span v-if="item.item.make != ''">{{ truncatedString(item.item.make) }}</span></td>
+                                <td><span v-if="item.item.asset_type != ''">{{ truncatedString(item.item.asset_type) }}</span></td>
+                                <td><span v-if="item.item.host_name != ''">{{ truncatedString(item.item.host_name) }}</span>
                                 </td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.PLK_VLAN10_POS_SICOM_Subnet != ''">{{ truncatedString(
                                     item.item.PLK_VLAN10_POS_SICOM_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.PLK_VLAN70_Kiosk_Subnet != ''">{{ truncatedString(
                                     item.item.PLK_VLAN70_Kiosk_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.PLK_VLAN254_Meraki_Management_Subnet != ''">{{ truncatedString(
                                     item.item.PLK_VLAN254_Meraki_Management_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.PLK_VLAN4_Subnet != ''">{{ truncatedString(
                                     item.item.PLK_VLAN4_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.BK_VLAN10_POS_SICOM_Subnet != ''">{{ truncatedString(
                                     item.item.BK_VLAN10_POS_SICOM_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.BK_VLAN70_Kiosk_Subnet != ''">{{ truncatedString(
                                     item.item.BK_VLAN70_Kiosk_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.BK_VLAN254_Meraki_Management_Subnet != ''">{{ truncatedString(
                                     item.item.BK_VLAN254_Meraki_Management_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.BK_VLAN4_Subnet != ''">{{ truncatedString(
                                     item.item.BK_VLAN4_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.THS_VLAN10_POS_SICOM_Subnet != ''">{{ truncatedString(
                                     item.item.THS_VLAN10_POS_SICOM_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.THS_VLAN70_Kiosk_Subnet != ''">{{ truncatedString(
                                     item.item.THS_VLAN70_Kiosk_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.THS_VLAN254_Meraki_Management_Subnet != ''">{{ truncatedString(
                                     item.item.THS_VLAN254_Meraki_Management_Subnet) }}</span></td>
-                                <td><span>{{ truncatedString(
+                                <td><span v-if="item.item.THS_VLAN4_Subnet != ''">{{ truncatedString(
                                     item.item.THS_VLAN4_Subnet) }}</span></td>
 
                             </tr>
