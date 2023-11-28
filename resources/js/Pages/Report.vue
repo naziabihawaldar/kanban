@@ -1,68 +1,74 @@
 <script setup>
-import { ref } from 'vue';
+import Datepicker from 'vue3-datepicker';
+import { ref, watch } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import moment from 'moment';
-
+import InputLabel from '@/Components/InputLabel.vue';
 const headers = [
-    { "title": "Vulnerability Name", "key": "vulnerabilityName", "align": "left" },
-    { "title": "Vulnerability ID", "key": "vulnerabilityID", "align": "left" },
-    { "title": "Vulnerability Description", "key": "vulnerabilityDescription", "align": "left" },
-    { "title": "Board", "key": "board", "align": "left" },
-    { "title": "Assigned To", "key": "assignedTo", "align": "left" },
-    { "title": "Start Date", "key": "start_date", "align": "left" },
-    { "title": "End Date", "key": "end_date", "align": "left" },
-    { "title": "Due Date", "key": "due_date", "align": "left" },
-    { "title": "Asset IP", "key": "assetIP", "align": "left" },
-    { "title": "IP & Vuln Id", "key": "ipAndVulnId", "align": "left" },
-    { "title": "Port", "key": "port", "align": "left" },
-    { "title": "Protocol", "key": "protocol", "align": "left" },
-    { "title": "OS Type/Version", "key": "osTypeVersion", "align": "left" },
-    { "title": "OS Version", "key": "osVersion", "align": "left" },
-    { "title": "Business Unit", "key": "businessUnit", "align": "left" },
-    { "title": "Class", "key": "class", "align": "left" },
-    { "title": "CVE ID", "key": "cveID", "align": "left" },
-    { "title": "CVSS Score", "key": "cvssScore", "align": "left" },
-    { "title": "Severity", "key": "severity", "align": "left" },
-    { "title": "Solution", "key": "solution", "align": "left" },
-    { "title": "Impact Of Vulnerability", "key": "impactOfVulnerability", "align": "left" },
-    { "title": "Scan Date Time", "key": "scanDateTime", "align": "left" },
-    { "title": "Background", "key": "background", "align": "left" },
-    { "title": "Service", "key": "service", "align": "left" },
-    { "title": "Remediation", "key": "remediation", "align": "left" },
-    { "title": "References", "key": "references", "align": "left" },
-    { "title": "Exception", "key": "exception", "align": "left" },
-    { "title": "Tags", "key": "tags", "align": "left" },
-    { "title": "Asset Version", "key": "assetVersion", "align": "left" },
-    { "title": "Model", "key": "model", "align": "left" },
-    { "title": "Make", "key": "make", "align": "left" },
-    { "title": "Asset Type", "key": "assetType", "align": "left" },
-    { "title": "Host Name", "key": "hostName", "align": "left" },
-    { "title": "PLK_VLAN10 (POS-SICOM) Subnet", "key": "plkVLAN10Subnet", "align": "left" },
-    { "title": "PLK_VLAN70 (Kiosk)", "key": "plkVLAN70", "align": "left" },
-    { "title": "PLK_VLAN254 (Meraki-Management)", "key": "plkVLAN254", "align": "left" },
-    { "title": "PLK_VLAN4 Subnet", "key": "plkVLAN4Subnet", "align": "left" },
-    { "title": "BK_VLAN10 (POS-SICOM) Subnet", "key": "bkVLAN10Subnet", "align": "left" },
-    { "title": "BK_VLAN70 (Kiosk)", "key": "bkVLAN70", "align": "left" },
-    { "title": "BK_VLAN254 (Meraki-Management)", "key": "bkVLAN254", "align": "left" },
-    { "title": "BK_VLAN4 Subnet", "key": "bkVLAN4Subnet", "align": "left" },
-    { "title": "THS_VLAN10 (POS-SICOM) Subnet", "key": "thsVLAN10Subnet", "align": "left" },
-    { "title": "THS_VLAN70 (Kiosk)", "key": "thsVLAN70", "align": "left" },
-    { "title": "THS_VLAN254 (Meraki-Management)", "key": "thsVLAN254", "align": "left" },
-    { "title": "THS_VLAN4 Subnet", "key": "thsVLAN4Subnet", "align": "left" }
+    { "title": "Vulnerability Name", "key": "vulnerabilityName", "align": "left", sortable: false },
+    { "title": "Vulnerability ID", "key": "vulnerabilityID", "align": "left", sortable: false },
+    { "title": "Vulnerability Description", "key": "vulnerabilityDescription", "align": "left", sortable: false },
+    { "title": "Board", "key": "board", "align": "left", sortable: false },
+    { "title": "Assigned To", "key": "assignedTo", "align": "left", sortable: false },
+    { "title": "Start Date", "key": "start_date", "align": "left", sortable: false },
+    { "title": "End Date", "key": "end_date", "align": "left", sortable: false },
+    { "title": "Due Date", "key": "due_date", "align": "left", sortable: false },
+    { "title": "Asset IP", "key": "assetIP", "align": "left", sortable: false },
+    { "title": "IP & Vuln Id", "key": "ipAndVulnId", "align": "left", sortable: false },
+    { "title": "Port", "key": "port", "align": "left", sortable: false },
+    { "title": "Protocol", "key": "protocol", "align": "left", sortable: false },
+    { "title": "OS Type/Version", "key": "osTypeVersion", "align": "left", sortable: false },
+    { "title": "OS Version", "key": "osVersion", "align": "left", sortable: false },
+    { "title": "Business Unit", "key": "businessUnit", "align": "left", sortable: false },
+    { "title": "Class", "key": "class", "align": "left", sortable: false },
+    { "title": "CVE ID", "key": "cveID", "align": "left", sortable: false },
+    { "title": "CVSS Score", "key": "cvssScore", "align": "left", sortable: false },
+    { "title": "Severity", "key": "severity", "align": "left", sortable: false },
+    { "title": "Solution", "key": "solution", "align": "left", sortable: false },
+    { "title": "Impact Of Vulnerability", "key": "impactOfVulnerability", "align": "left", sortable: false },
+    { "title": "Scan Date Time", "key": "scanDateTime", "align": "left", sortable: false },
+    { "title": "Background", "key": "background", "align": "left", sortable: false },
+    { "title": "Service", "key": "service", "align": "left", sortable: false },
+    { "title": "Remediation", "key": "remediation", "align": "left", sortable: false },
+    { "title": "References", "key": "references", "align": "left", sortable: false },
+    { "title": "Exception", "key": "exception", "align": "left", sortable: false },
+    { "title": "Tags", "key": "tags", "align": "left", sortable: false },
+    { "title": "Asset Version", "key": "assetVersion", "align": "left", sortable: false },
+    { "title": "Model", "key": "model", "align": "left", sortable: false },
+    { "title": "Make", "key": "make", "align": "left", sortable: false },
+    { "title": "Asset Type", "key": "assetType", "align": "left", sortable: false },
+    { "title": "Host Name", "key": "hostName", "align": "left", sortable: false },
+    { "title": "PLK_VLAN10 (POS-SICOM) Subnet", "key": "plkVLAN10Subnet", "align": "left", sortable: false },
+    { "title": "PLK_VLAN70 (Kiosk)", "key": "plkVLAN70", "align": "left", sortable: false },
+    { "title": "PLK_VLAN254 (Meraki-Management)", "key": "plkVLAN254", "align": "left", sortable: false },
+    { "title": "PLK_VLAN4 Subnet", "key": "plkVLAN4Subnet", "align": "left", sortable: false },
+    { "title": "BK_VLAN10 (POS-SICOM) Subnet", "key": "bkVLAN10Subnet", "align": "left", sortable: false },
+    { "title": "BK_VLAN70 (Kiosk)", "key": "bkVLAN70", "align": "left", sortable: false },
+    { "title": "BK_VLAN254 (Meraki-Management)", "key": "bkVLAN254", "align": "left", sortable: false },
+    { "title": "BK_VLAN4 Subnet", "key": "bkVLAN4Subnet", "align": "left", sortable: false },
+    { "title": "THS_VLAN10 (POS-SICOM) Subnet", "key": "thsVLAN10Subnet", "align": "left", sortable: false },
+    { "title": "THS_VLAN70 (Kiosk)", "key": "thsVLAN70", "align": "left", sortable: false },
+    { "title": "THS_VLAN254 (Meraki-Management)", "key": "thsVLAN254", "align": "left", sortable: false },
+    { "title": "THS_VLAN4 Subnet", "key": "thsVLAN4Subnet", "align": "left", sortable: false }
 ];
 const loadItems = (data) => {
     serverItems.value = [];
-    var pagination = { sortBy: data.sortBy, descending: true, rowsPerPage: data.itemsPerPage, query: '', page: data.page };
-    axios.get('/get-reports', { params: { rowsPerPage: data.itemsPerPage, query: '', page: data.page } }).then((res) => {
+    console.log(JSON.stringify(data));
+    if(typeof data == 'undefined' )
+    {
+        var data = {};
+        data.itemsPerPage = 15;
+        data.page = 1;
+        data.sortBy = null;
+    }
+    axios.get('/get-reports', { params: { rowsPerPage: data.itemsPerPage, query: '', page: data.page, sortBy: data.sortBy,filter:filterForm } }).then((res) => {
         if (res.data.status == 'success') {
-            //console.log(JSON.stringify(res.data));
             serverItems.value = res.data.data.data;
             totalItems.value = res.data.data.total;
             loading.value = false;
         }
     }).catch((error) => {
-        // console.log(error);
     })
 };
 
@@ -72,6 +78,7 @@ const serverItems = ref([]);
 const loading = ref(true);
 const exportLoading = ref(false);
 const totalItems = ref(0);
+const filterDialog = ref(false);
 var truncatedString = function (strg) {
     if (strg != null) {
         var trn = strg.slice(0, 50);
@@ -81,7 +88,7 @@ var truncatedString = function (strg) {
 };
 const exportDownload = () => {
     exportLoading.value = true;
-    axios.post('/reports/export').then((response) => {
+    axios.post('/reports/export',{filter:filterForm}).then((response) => {
         download(response.data, 'reports');
     }).catch((error) => {
         console.log(error);
@@ -100,13 +107,169 @@ const download = (data, file_name) => {
     link.click();
 };
 
+const openModal = () => {
+    filterDialog.value = true;
+};
+const closeModal = () => {
+    filterDialog.value = false;
+};
+//Filter Popup
+const filter_select = ref(null);
+const filter_keyword = ref('');
+const filter_items = ref([]);
+const filter_loading = ref(false);
+const filter_scan_date = ref(new Date());
+const filter_start_date = ref(new Date());
+const filter_end_date = ref(new Date());
+const filter_due_date = ref(new Date());
+const chipModal = ref(false);
+var obj = {};
+const filterForm = useForm({
+    assignee: '',
+    severity: '',
+    domain: '',
+    scan_date: '',
+    vulnerabilityName: '',
+    ip_and_vuln_id: '',
+    os_type: '',
+    os_version: '',
+    business_unit: '',
+});
+const filter_query = async (query) => {
+    if (query != null && query.length > 1) {
+        filter_loading.value = true;
+        const response = await axios.post('/search-user', {
+            query: query
+        });
+        if (response.data.length) {
+            filter_items.value = response.data;
+            filter_loading.value = false;
+        }
+    }
+
+};
+watch(filter_keyword, (v) => {
+    filter_query(v);
+});
+const submitFilter = () => {
+    console.log(JSON.stringify(filterForm));
+    chipModal.value = false;
+  var value = filter_select.value;
+  obj = {};
+  if (value !== null && typeof value === 'object') {
+    filterForm.assignee = value.id;
+    Object.assign(obj, { Assignee: value.name });
+  }
+
+  Object.keys(filterForm).forEach(function (key) {
+    if (key == 'severity' && filterForm[key] != '') {
+      Object.assign(obj, { Severity: filterForm[key] });
+    }
+    if (key == 'domain' && filterForm[key] != '') {
+      Object.assign(obj, { Domain: filterForm[key] });
+    }
+    if (key == 'scan_date' && filterForm[key] != '') {
+      Object.assign(obj, { ScanDate: filterForm[key] });
+    }
+    if (key == 'vulnerabilityName' && filterForm[key] != '') {
+      Object.assign(obj, { VulnerabilityName: filterForm[key] });
+    }
+    if (key == 'ip_and_vuln_id' && filterForm[key] != '') {
+      Object.assign(obj, { IPAndVulnId: filterForm[key] });
+    }
+    if (key == 'os_type' && filterForm[key] != '') {
+      Object.assign(obj, { OSType: filterForm[key] });
+    }
+    if (key == 'os_version' && filterForm[key] != '') {
+      Object.assign(obj, { OSVersion: filterForm[key] });
+    }
+    if (key == 'business_unit' && filterForm[key] != '') {
+      Object.assign(obj, { BusinessUnit: filterForm[key] });
+    }
+
+
+  });
+  if (Object.keys(obj).length != 0) {
+    chipModal.value = true;
+  }
+  closeModal();
+  loadItems();
+//   this.$refs.vuetable.reload();
+};
+function resetFilter(val) {
+  chipModal.value = false;
+  var selVal = val.toLowerCase();
+  console.log(selVal);
+  if (selVal == 'assignee') {
+    filter_select.value = '';
+    delete obj.Assignee;
+    filterForm.assignee = null;
+    filterForm.reset('assignee');
+  }
+  if (selVal == 'severity') {
+    delete obj.Severity;
+    filterForm.severity = null;
+    filterForm.reset('severity');
+  }
+  if (selVal == 'domain') {
+    delete obj.Domain;
+    filterForm.domain = null;
+    filterForm.reset('severity');
+  }
+
+  if (selVal == 'scandate') {
+    delete obj.ScanDate;
+    filterForm.scan_date = null;
+  }
+  if (selVal == 'businessunit') {
+    delete obj.BusinessUnit;
+    filterForm.business_unit = null;
+  }
+  if (selVal == 'ipandvulnid') {
+    delete obj.IPAndVulnId;
+    filterForm.ip_and_vuln_id = null;
+  }
+
+  if (selVal == 'osversion') {
+    delete obj.OSVersion;
+    filterForm.os_version = null;
+  }
+  if (selVal == 'ostype') {
+    delete obj.OSType;
+    filterForm.os_type = null;
+  }
+  if (selVal == 'vulnerabilityname') {
+    delete obj.VulnerabilityName;
+    filterForm.vulnerabilityName = null;
+  }
+
+
+  console.log(selVal);
+  console.log(JSON.stringify(obj));
+  console.log(JSON.stringify(filterForm));
+
+  console.log(Object.keys(obj).length);
+
+  if (Object.keys(obj).length != 0) {
+    chipModal.value = true;
+  }
+  loadItems(); 
+}
+
 </script>
+
 <template>
     <Head>
         <title>Reports</title>
     </Head>
     <AuthenticatedLayout>
         <v-container>
+            <template v-if="chipModal">
+                <v-chip v-for="(value, index) in obj" :key="index" class="ma-2" closable color="primary" text-color="white"
+                    @click:close="resetFilter(index)">
+                    {{ index }} : {{ value }}
+                </v-chip>
+            </template>
             <v-row no-gutters>
                 <v-col cols="6">
                     <h2 class="font-black text-xl text-gray-800 leading-tight">Reports</h2>
@@ -114,16 +277,17 @@ const download = (data, file_name) => {
                 <v-col cols="6" align="right" class="text-right">
                     <v-btn size="small" color="primary" @click="exportDownload" :disabled="exportLoading"
                         :loading="exportLoading">Export</v-btn>
-                    <v-btn style="font-size: 22px;" size="small" class="ma-2" variant="text" icon="mdi mdi-filter-variant"
-                        color="black-lighten-4"></v-btn>
+                    <v-btn style="font-size: 22px;" size="small" @click="openModal" class="ma-2" variant="text"
+                        icon="mdi mdi-filter-variant" color="black-lighten-4"></v-btn>
                 </v-col>
                 <v-col cols="12">
-                    <v-data-table-server class="dense" v-model:items-per-page="itemsPerPage" :headers="headers"
+                    <v-data-table-server ref="vuetable" class="dense" v-model:items-per-page="itemsPerPage" :headers="headers"
                         :items-length="totalItems" :items="serverItems" :loading="loading" :search="search"
-                        item-value="name" @update:options="loadItems">
+                        item-value="name" @update:options="loadItems" @request="loadItems">
                         <template v-slot:item="item">
                             <tr>
-                                <td><span v-if="item.item.vulnerability_title != ''">{{ truncatedString(item.item.vulnerability_title) }}</span></td>
+                                <td><span v-if="item.item.vulnerability_title != ''">{{
+                                    truncatedString(item.item.vulnerability_title) }}</span></td>
                                 <td><span v-if="item.item.vulnerability_id != ''">{{ truncatedString(
                                     item.item.vulnerability_id) }}</span></td>
                                 <td><span v-if="item.item.vulnerability_desc != ''">{{ truncatedString(
@@ -157,7 +321,7 @@ const download = (data, file_name) => {
                                 </td>
                                 <td><span v-if="item.item.cvss_score != ''">{{ truncatedString(
                                     item.item.cvss_score) }}</span></td>
-                                <td><span  v-if="item.item.severity != ''">{{ truncatedString(item.item.severity) }}</span>
+                                <td><span v-if="item.item.severity != ''">{{ truncatedString(item.item.severity) }}</span>
                                 </td>
                                 <td><span v-if="item.item.solution != ''">{{ truncatedString(item.item.solution) }}</span>
                                 </td>
@@ -167,9 +331,9 @@ const download = (data, file_name) => {
                                     item.item.scan_date_time) }}</span></td>
                                 <td><span v-if="item.item.background != ''">{{ truncatedString(
                                     item.item.background) }}</span></td>
-                                <td><span v-if="item.item.service != ''" >{{ truncatedString(item.item.service) }}</span>
+                                <td><span v-if="item.item.service != ''">{{ truncatedString(item.item.service) }}</span>
                                 </td>
-                                <td><span v-if="item.item.remediation != ''" >{{ truncatedString(
+                                <td><span v-if="item.item.remediation != ''">{{ truncatedString(
                                     item.item.remediation) }}</span></td>
                                 <td><span v-if="item.item.references != ''">{{ truncatedString(
                                     item.item.references) }}</span></td>
@@ -181,7 +345,8 @@ const download = (data, file_name) => {
                                 <td><span v-if="item.item.model != ''">{{ truncatedString(item.item.model) }}</span>
                                 </td>
                                 <td><span v-if="item.item.make != ''">{{ truncatedString(item.item.make) }}</span></td>
-                                <td><span v-if="item.item.asset_type != ''">{{ truncatedString(item.item.asset_type) }}</span></td>
+                                <td><span v-if="item.item.asset_type != ''">{{ truncatedString(item.item.asset_type)
+                                }}</span></td>
                                 <td><span v-if="item.item.host_name != ''">{{ truncatedString(item.item.host_name) }}</span>
                                 </td>
                                 <td><span v-if="item.item.PLK_VLAN10_POS_SICOM_Subnet != ''">{{ truncatedString(
@@ -211,9 +376,123 @@ const download = (data, file_name) => {
 
                             </tr>
                         </template>
-                </v-data-table-server>
-            </v-col>
-        </v-row>
-    </v-container>
+                    </v-data-table-server>
+                </v-col>
+            </v-row>
+        </v-container>
+        <v-dialog v-model="filterDialog" width="800">
+            <form @submit.prevent="submitFilter">
+                <v-card class="h-full">
+                    <v-card-title>Filter</v-card-title>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="name" value="Assignee Name" />
+                                    <v-combobox outlined clearable chips color="green " v-model:search="filter_keyword"
+                                        no-filter v-model="filter_select" :items="filter_items" :loading="filter_loading"
+                                        item-title="name" item-value="id" @focus="() => filter_query(keyword)" />
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="name" value="Severity" />
+                                    <v-select outlined label="Select" v-model="filterForm.severity"
+                                        :items="['Critical', 'High', 'Medium', 'Low', 'Informational', 'None']"></v-select>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="Domain" />
+                                    <v-select outlined v-model="filterForm.domain"
+                                        :items="['System Services', 'Infrastructure']"></v-select>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="Start Date" />
+                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                        v-model="filter_start_date">
+                                        <template v-slot:clear="{ onClear }">
+                                            <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                                        </template>
+                                    </Datepicker>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="End Date" />
+                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                        v-model="filter_end_date">
+                                        <template v-slot:clear="{ onClear }">
+                                            <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                                        </template>
+                                    </Datepicker>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="Due Date" />
+                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                        v-model="filter_due_date">
+                                        <template v-slot:clear="{ onClear }">
+                                            <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                                        </template>
+                                    </Datepicker>
+                                </div>
+                            </v-col>
 
-</AuthenticatedLayout></template>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="Scan Date" />
+                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                        v-model="filter_scan_date">
+                                        <template v-slot:clear="{ onClear }">
+                                            <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                                        </template>
+                                    </Datepicker>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="Vulnerability Name" />
+                                    <v-text-field outlined v-model="filterForm.vulnerabilityName" label="Vulnerability Name"
+                                        hide-details></v-text-field>
+                                </div>
+                            </v-col>
+
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="domain" value="IP & Vulnerability ID:" />
+                                    <v-text-field outlined v-model="filterForm.ip_and_vuln_id" label="IP & Vulnerability ID"
+                                        hide-details></v-text-field>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <InputLabel value="OS Type" />
+                                <v-text-field outlined v-model="filterForm.os_type" label="OS Type"
+                                    hide-details></v-text-field>
+                            </v-col>
+
+                            <v-col cols="6">
+                                <InputLabel for="domain" value="OS Version:" />
+                                <v-text-field outlined v-model="filterForm.os_version" label="OS Version"
+                                    hide-details></v-text-field>
+                            </v-col>
+                            <v-col cols="6">
+                                <InputLabel value="Business Unit" />
+                                <v-text-field outlined v-model="filterForm.business_unit" label="Business Unit"
+                                    hide-details></v-text-field>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn size="small" text="Close" @click="closeModal"></v-btn>
+                        <v-btn size="small" text="Submit" type="submit"></v-btn>
+                    </v-card-actions>
+                </v-card>
+            </form>
+        </v-dialog>
+    </AuthenticatedLayout>
+</template>
