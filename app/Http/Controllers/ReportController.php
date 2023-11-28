@@ -24,7 +24,6 @@ class ReportController extends Controller
             if ($request->has('sortBy')) 
             {
                 $sort_data = $request->sortBy[0];
-                // logger($sort_data['order']);
                 $sort_order = 'DESC';
                 if ($sort_data['order'] == 'asc') {
                     $sort_order = 'ASC';

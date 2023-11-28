@@ -123,17 +123,49 @@ const filter_start_date = ref(new Date());
 const filter_end_date = ref(new Date());
 const filter_due_date = ref(new Date());
 const chipModal = ref(false);
+
 var obj = {};
 const filterForm = useForm({
     assignee: '',
     severity: '',
     domain: '',
     scan_date: '',
+    start_date: '',
+    end_date: '',
+    due_date: '',
     vulnerabilityName: '',
     ip_and_vuln_id: '',
     os_type: '',
     os_version: '',
     business_unit: '',
+});
+watch(filter_scan_date, (value) => {
+  var date = new Date(value);
+  const day = ('0' + date.getDate()).slice(-2);
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  filterForm.scan_date = year + '-' + month + '-' + day;
+});
+watch(filter_start_date, (value) => {
+  var date = new Date(value);
+  const day = ('0' + date.getDate()).slice(-2);
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  filterForm.start_date = year + '-' + month + '-' + day;
+});
+watch(filter_end_date, (value) => {
+  var date = new Date(value);
+  const day = ('0' + date.getDate()).slice(-2);
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  filterForm.end_date = year + '-' + month + '-' + day;
+});
+watch(filter_due_date, (value) => {
+  var date = new Date(value);
+  const day = ('0' + date.getDate()).slice(-2);
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  filterForm.due_date = year + '-' + month + '-' + day;
 });
 const filter_query = async (query) => {
     if (query != null && query.length > 1) {
@@ -171,6 +203,15 @@ const submitFilter = () => {
     if (key == 'scan_date' && filterForm[key] != '') {
       Object.assign(obj, { ScanDate: filterForm[key] });
     }
+    if (key == 'start_date' && filterForm[key] != '') {
+      Object.assign(obj, { StartDate: filterForm[key] });
+    }
+    if (key == 'end_date' && filterForm[key] != '') {
+      Object.assign(obj, { EndDate: filterForm[key] });
+    }
+    if (key == 'due_date' && filterForm[key] != '') {
+      Object.assign(obj, { DueDate: filterForm[key] });
+    }
     if (key == 'vulnerabilityName' && filterForm[key] != '') {
       Object.assign(obj, { VulnerabilityName: filterForm[key] });
     }
@@ -186,8 +227,6 @@ const submitFilter = () => {
     if (key == 'business_unit' && filterForm[key] != '') {
       Object.assign(obj, { BusinessUnit: filterForm[key] });
     }
-
-
   });
   if (Object.keys(obj).length != 0) {
     chipModal.value = true;
@@ -220,6 +259,18 @@ function resetFilter(val) {
   if (selVal == 'scandate') {
     delete obj.ScanDate;
     filterForm.scan_date = null;
+  }
+  if (selVal == 'startdate') {
+    delete obj.StartDate;
+    filterForm.start_date = null;
+  }
+  if (selVal == 'enddate') {
+    delete obj.EndDate;
+    filterForm.end_date = null;
+  }
+  if (selVal == 'duedate') {
+    delete obj.DueDate;
+    filterForm.due_date = null;
   }
   if (selVal == 'businessunit') {
     delete obj.BusinessUnit;
