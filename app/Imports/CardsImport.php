@@ -20,28 +20,35 @@ class CardsImport implements ToModel, WithHeadingRow
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
-    public $boardId;
+    public $boardId,$imprt_file;
 
-    public function __construct($board_id) {
+    public function __construct($board_id,$import_file) {
         $this->boardId = $board_id;
+        $this->imprt_file = $import_file;
     }
     public function model(array $row)
     {      
         logger($row);
 
         $board_id = $this->boardId;  
+        $import_id = $this->imprt_file;  
         $board = Board::find($board_id);
         if($board)
         {   
             $column = Column::where('board_id',$board_id)->where('title','To Do')->first();
             if($column)
             {
-                $newRecord = new Card;
-                $newRecord->column_id = $column->id;
-                $newRecord->board_id = $board_id;
+                $newRecord = Card::where('vulnerability_id',$row['vulnerability_id'])->first();
+                if(!$newRecord)
+                {
+                    $newRecord = new Card;
+                    $newRecord->column_id = $column->id;
+                    $newRecord->board_id = $board_id;
+                    $newRecord->vulnerability_id = $row['vulnerability_id'];
+                }
+                $newRecord->import_id = optional($import_id)->id;
                 $newRecord->content = $row['vulnerability_description'];
                 $newRecord->vulnerability_title = $row['vulnerability_name'];
-                $newRecord->vulnerability_id = $row['vulnerability_id'];
                 $newRecord->vulnerability_desc = $row['vulnerability_description'];
                 $newRecord->vulnerability_details = $row['vulnerability_details'];
                 $newRecord->asset_ip = $row['asset_ip'];

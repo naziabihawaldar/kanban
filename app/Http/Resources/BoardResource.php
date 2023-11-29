@@ -19,6 +19,7 @@ class BoardResource extends JsonResource
             'title' => $this->title,
             'board_assignees' => UserResource::collection($this->whenLoaded('assignees')),
             'columns' => ColumnResource::collection($this->whenLoaded('columns')),
+            'imports' => $this->whenLoaded('imports'),
         ];
 
         //

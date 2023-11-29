@@ -25,7 +25,7 @@ class BoardController extends Controller
         }
 
         // eager load columns with their cards
-        $board?->loadMissing(['columns.cards','columns.cards.users','assignees','columns.cards.comments','columns.cards.comments.user']);
+        $board?->loadMissing(['columns.cards','columns.cards.users','assignees','columns.cards.comments','columns.cards.comments.user','imports']);
 
         return inertia('Kanban', [
             'board' => $board ? BoardResource::make($board) : null,
@@ -61,10 +61,12 @@ class BoardController extends Controller
 
     public function getDetailsByFilter(Request $request) 
     {
+        
         $columns = Column::where('board_id', $request->board_id)->get();
         foreach ($columns as $column)
         {
             $cards = $column->cards()->with('users');
+            // $filters = $request->
             
             if($request->has('severity') && $request->severity != '')
             {
@@ -74,6 +76,13 @@ class BoardController extends Controller
             {
                 $cards = $cards->whereHas('users', function ($q) use ($request, $column) {
                     $q->where('users.id',  $request->assignee );  
+                });
+            }
+            if($request->has('imports') && $request->imports != '')
+            {
+               
+                $cards = $cards->whereHas('import', function ($q) use ($request) {
+                    $q->where('imports.name',  $request->imports);  
                 });
             }
             if($request->has('domain') && $request->domain != '')
@@ -100,8 +109,7 @@ class BoardController extends Controller
             {
                 $cards = $cards->where('ip_and_vuln_id',$request->ip_and_vuln_id);
             }
-
-
+            
             $cards = $cards->get();
             $column->cards = $cards;
         }
@@ -129,7 +137,6 @@ class BoardController extends Controller
 
     public function updateCardDetails(Request $request)
     {
-        logger($request);
         $card = Card::find($request->card_id);
         if($card)
         {
@@ -173,7 +180,6 @@ class BoardController extends Controller
 
     public function updateBoardUsers(Request $request)
     {
-        logger($request);
         $board = Board::find($request->board_id);
         if($board)
         {

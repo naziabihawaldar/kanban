@@ -14,10 +14,11 @@ var obj = {};
 // const columns = computed(() => props.board?.data?.columns);
 const columns = ref(props.board?.data?.columns);
 const boardTitle = computed(() => props.board?.data?.title);
+const importsData = computed(() => props.board?.data?.imports);
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
 const columnsWithOrder = ref([]);
-
+console.log(JSON.stringify(importsData.value));
 const onReorderChange = column => {
   console.log("called inside kanban for onReorderChange");
   // columnsWithOrder.value?.push(column);
@@ -54,6 +55,7 @@ const openFilterModal = () => {
 
 //Import Form   
 const form = useForm({
+  name: '',
   file: [],
   board_id: boardID,
 });
@@ -62,6 +64,7 @@ const filterForm = useForm({
   board_id: boardID,
   assignee: '',
   severity: '',
+  imports: '',
   domain: '',
   scan_date: '',
   vulnerabilityName: '',
@@ -72,10 +75,13 @@ const filterForm = useForm({
 });
 
 const submit = () => {
+  console.log(JSON.stringify(form));
+  console.log(JSON.stringify(form.file));
   form.post('/upload-board', {
     onFinish: () => {
       form.reset('file');
       form.file = [];
+      form.name = '';
       myDialog.value = false;
       snackbar_show.value = true;
       snackbar_msg.value = "successfully uploaded";
@@ -100,6 +106,7 @@ watch(group_by_var, (value) => {
 const filter_select = ref(null);
 const filter_keyword = ref('');
 const filter_items = ref([]);
+const filter_data = ref([]);
 const filter_loading = ref(false);
 const filter_scan_date = ref(new Date());
 
@@ -138,6 +145,7 @@ const submitFilter = () => {
   }
 
   Object.keys(filterForm).forEach(function (key) {
+    console.log("<<<<<"+key);
     if (key == 'severity' && filterForm[key] != '') {
       Object.assign(obj, { Severity: filterForm[key] });
     }
@@ -162,18 +170,25 @@ const submitFilter = () => {
     if (key == 'business_unit' && filterForm[key] != '') {
       Object.assign(obj, { BusinessUnit: filterForm[key] });
     }
-
+    
+    if (key == 'imports' && filterForm[key] != '') {
+      Object.assign(obj, { Imports: filterForm[key] });
+    }
 
   });
   if (Object.keys(obj).length != 0) {
     chipModal.value = true;
   }
+  console.log(JSON.stringify(filterForm));
+  closeFilterModal();
   callFilterAPI(filterForm);
 };
 
-
 function callFilterAPI(postData) {
-  axios.post('/get-cards-based-on-filters', postData).then((res) => {
+  filter_data.value = postData;
+  // console.log(JSON.stringify(filter_data.value));
+  key_column.value = key_column.value ? false : true;
+  /*axios.post('/get-cards-based-on-filters', postData).then((res) => {
     if (res.data.status == 'success') {
       columns.value = [];
       columns.value = res.data.data;
@@ -183,7 +198,8 @@ function callFilterAPI(postData) {
     }
   }).catch((error) => {
     // console.log(error);
-  })
+  });
+  */
 }
 
 function resetFilter(val) {
@@ -232,7 +248,10 @@ function resetFilter(val) {
     delete obj.VulnerabilityName;
     filterForm.vulnerabilityName = null;
   }
-
+  if (selVal == 'imports') {
+    delete obj.Imports;
+    filterForm.imports = null;
+  }
 
   console.log(selVal);
   console.log(JSON.stringify(obj));
@@ -242,6 +261,8 @@ function resetFilter(val) {
     chipModal.value = true;
     callFilterAPI(filterForm);
   } else {
+    key_column.value = key_column.value ? false : true;
+    columns.value = [];
     columns.value = props.board?.data?.columns;
   }
 }
@@ -302,6 +323,10 @@ var getNameInitials = function (string) {
   }
   return initials;
 };
+
+var required = function (v) {
+  return !!v || 'Field is required'
+}
 // var color_arrays = ['#DE350B','#DE350B'];
 
 // var random = color_arrays.random();
@@ -310,6 +335,9 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688', '#795548'];
 const columnReload = (obj) => {
   key_column.value = key_column.value ? false : true;
 }
+// const rules = (value) =>{
+//     required: value => !!value || 'Field is required',
+// }
 </script>
 
 <template>
@@ -336,7 +364,8 @@ const columnReload = (obj) => {
           </div>
         </v-col>
         <v-col cols="6" align="right" class="text-right">
-          <v-btn v-if="$page.props.auth.user.roles[0].name != 'user'" size="small" color="primary" @click="openModal">Import</v-btn>
+          <v-btn v-if="$page.props.auth.user.roles[0].name != 'user'" size="small" color="primary"
+            @click="openModal">Import</v-btn>
           <v-btn style="font-size: 22px;" size="small" @click="openFilterModal" class="ma-2" variant="text"
             icon="mdi mdi-filter-variant  " color="black-lighten-4"></v-btn>
         </v-col>
@@ -353,7 +382,7 @@ const columnReload = (obj) => {
       <div class="flex-1 h-full overflow-x-auto">
         <div class="inline-flex h-full items-start space-x-4 overflow-hidden">
 
-          <Column :boardId=boardID :boardtitle="boardTitle" :key="key_column" />
+          <Column :boardId=boardID :boardtitle="boardTitle" :filters="filter_data" :key="key_column" />
           <!-- <Column v-for="column in columns" :key="temp_var" :column="column" @reorder-change="onReorderChange"
             @reorder-commit="onReorderCommit" /> -->
           <div class="w-72">
@@ -401,6 +430,7 @@ const columnReload = (obj) => {
                     item-value="id" @focus="() => filter_query(keyword)" />
                 </div>
               </v-col>
+
               <v-col cols="6">
                 <div>
                   <InputLabel for="name" value="Severity" />
@@ -446,13 +476,18 @@ const columnReload = (obj) => {
               </v-col>
 
               <v-col cols="6" class="mt-4">
-                <InputLabel for="domain" value="OS Version:" />
+                <InputLabel for="domain" value="OS Version" />
                 <v-text-field outlined v-model="filterForm.os_version" label="OS Version" hide-details></v-text-field>
               </v-col>
               <v-col cols="5" class="mr-3 mt-4">
                 <InputLabel value="Business Unit" />
                 <v-text-field outlined v-model="filterForm.business_unit" label="Business Unit"
                   hide-details></v-text-field>
+              </v-col>
+              <v-col cols="6" class="mt-4">
+                <InputLabel for="imports" value="Imports" />
+                <v-select outlined label="Select" v-model="filterForm.imports"
+                    :items="importsData" item-title="name"></v-select>
               </v-col>
             </v-row>
 
@@ -470,12 +505,21 @@ const columnReload = (obj) => {
       <v-card>
         <form @submit.prevent="submit">
           <v-card title="Import">
-            <v-card-text class="pb-0"> 
-              <v-file-input v-model="form.file" prepend-icon="mdi-camera" variant="outlined" label="File input"
-                density="compact"></v-file-input>
-              <progress v-if="form.progress" :value="form.progress.percentage" max="100">{{ form.progress.percentage
-              }}%</progress>
-
+            <v-card-text class="pb-0">
+              <v-text-field outlined label="Please Enter File name" v-model="form.name" :rules="[required]" clearable
+                density="compact"></v-text-field>
+              <v-row>
+                <v-col cols="12">
+                  <div>
+                  </div>
+                </v-col>
+                <v-col cols="12">
+                  <v-file-input v-model="form.file" required variant="outlined" label="File input"
+                    density="compact"></v-file-input>
+                  <progress v-if="form.progress" :value="form.progress.percentage" max="100">{{ form.progress.percentage
+                  }}%</progress>
+                </v-col>
+              </v-row>
               <div style="text-align: right;color:blue;">
                 <a href="/import.xlsx" download>Download Sample Template</a>
               </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Board;
 use App\Models\Card;
+use App\Models\Import;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
@@ -20,11 +21,17 @@ class CardController extends Controller
             $file = $request->file('file');
             if ($file === null) {
                 logger("Invalid file");
-            } else {
-                // $path = $file[0]->getRealPath();
-                // $filePath = $file[0]->getPathname();
-                // \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\CardsImport($board_id), $path);
-                $data = Excel::import(new CardsImport($board_id),$file[0]);
+                // return back();
+            }
+            if(isset($request->name) && $request->name != '')
+            {
+                $importFile = new Import;
+                $importFile->name = $request->name;
+                $importFile->board_id = $board_id;
+                $importFile->uploaded_by = Auth::id();
+                $importFile->save();
+
+                $data = Excel::import(new CardsImport($board_id,$importFile),$file[0]);
 
                 $board = Board::find($board_id);
 
@@ -34,8 +41,8 @@ class CardController extends Controller
                 ->log('A file was imported by ' . Auth::user()->name);
                 // Process the uploaded file
                 return back();
+
             }
-            
         }       
     }
 

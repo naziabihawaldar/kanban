@@ -76,7 +76,6 @@ class ReportController extends Controller
 
     public function export(Request $request)
     {
-        logger($request);
         return (new ReportExport($request))->download('reports.csv');
     }
 }

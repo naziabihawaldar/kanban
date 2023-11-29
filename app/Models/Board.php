@@ -33,4 +33,8 @@ class Board extends Model
     {
         return $this->belongsToMany(User::class, 'board_user')->withPivot('assigned_by')->withTimestamps();
     }
+    public function imports()
+    {
+        return $this->hasMany(Import::class)->latest();
+    }
 }
