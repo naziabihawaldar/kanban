@@ -85,8 +85,6 @@ const filterForm = useForm({
 });
 
 const submit = () => {
-  console.log(JSON.stringify(form));
-  console.log(JSON.stringify(form.file));
   form.post('/upload-board', {
     onFinish: () => {
       form.reset('file');
@@ -154,6 +152,7 @@ const submitBulkDelete = () => {
       deleteForm.fileId = '';
       snackbar_show.value = true;
       snackbar_msg.value = "Successfully Deleted";
+      router.reload();
       key_column.value = key_column.value ? false : true;
     }
   }).catch((error) => {

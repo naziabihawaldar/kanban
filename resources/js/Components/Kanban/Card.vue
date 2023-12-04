@@ -245,7 +245,7 @@ watch(due_date, (value) => {
       <p class="text-sm">{{ cardContent }}</p>
       <v-row>
         <v-col cols="12" class="pa-0 pt-2 pl-2">
-          <div class="text-lg-left left-1 pt-2" style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: left;" v-html="formatDueDate(card.due_date)">
+          <div class="text-lg-left left-1 pt-2" style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: left;" v-if="card.due_date != null" v-html="formatDueDate(card.due_date)">
           </div>
         </v-col>
         <v-col cols="6" class="pa-0 pl-2">

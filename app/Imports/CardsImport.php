@@ -27,8 +27,21 @@ class CardsImport implements ToModel, WithHeadingRow
         $this->imprt_file = $import_file;
     }
     public function model(array $row)
-    {      
-        logger($row);
+    {
+        
+        $start_date = $end_date = $due_date = null;
+        if(isset($row['start_date']) && $row['start_date'] != null)
+        {
+            $start_date =  \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['start_date']))->format('Y-m-d');
+        }
+        if(isset($row['end_date']) && $row['end_date'] != null)
+        {
+            $end_date =  \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['end_date']))->format('Y-m-d');
+        }
+        if(isset($row['due_date']) && $row['due_date'] != null)
+        {
+            $due_date =  \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['due_date']))->format('Y-m-d');
+        }
 
         $board_id = $this->boardId;  
         $import_id = $this->imprt_file;  
@@ -88,9 +101,9 @@ class CardsImport implements ToModel, WithHeadingRow
                 $newRecord->THS_VLAN70_Kiosk_Subnet = $row['ths_vlan70_kiosk'];
                 $newRecord->THS_VLAN254_Meraki_Management_Subnet = $row['ths_vlan254_meraki_management'];
                 $newRecord->THS_VLAN4_Subnet = $row['ths_vlan4_subnet'];
-                $newRecord->start_date = now(); // Assuming you want the current date and time
-                $newRecord->end_date = now();   // Assuming you want the current date and time
-                $newRecord->due_date = \Carbon\Carbon::parse($row['due_date'])->format('Y-m-d');   // Assuming you want the current date and time
+                $newRecord->start_date = $start_date; // Assuming you want the current date and time
+                $newRecord->end_date = $end_date;   // Assuming you want the current date and time
+                $newRecord->due_date = $due_date;   // Assuming you want the current date and time
                 $newRecord->created_by = Auth::id();
                 $newRecord->save();
                 $user = User::where('email',$row['assigned_by_email'])->first();
@@ -112,5 +125,6 @@ class CardsImport implements ToModel, WithHeadingRow
                 ->log(Auth::user()->name.' created the Issue');
             }
         }
+        
     }
 }

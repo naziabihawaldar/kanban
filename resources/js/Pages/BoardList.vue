@@ -6,7 +6,7 @@
         <v-container>
             <v-row no-gutters>
                 <v-col cols="8">
-                    <h2 class="font-black text-xl text-gray-800 leading-tight">Board List</h2>
+                    <h2 class="font-black text-xl text-gray-800 leading-tight">Project List</h2>
                 </v-col>
                 <v-col cols="4" align="right">
                     <v-spacer></v-spacer>
