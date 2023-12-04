@@ -1,6 +1,6 @@
 <template>
     <Head>
-        <title>Board List</title>
+        <title>Project List</title>
     </Head>
     <AuthenticatedLayout>
         <v-container>

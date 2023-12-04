@@ -38,7 +38,7 @@ class CardsImport implements ToModel, WithHeadingRow
             $column = Column::where('board_id',$board_id)->where('title','To Do')->first();
             if($column)
             {
-                $newRecord = Card::where('vulnerability_id',$row['vulnerability_id'])->first();
+                $newRecord = Card::where('vulnerability_id',$row['vulnerability_id'])->where('asset_ip',$row['asset_ip'])->first();
                 if(!$newRecord)
                 {
                     $newRecord = new Card;

@@ -82,6 +82,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-reports', [ReportController::class, 'getReportsData']);
     Route::post('/reports/export', [ReportController::class, 'export']);
 
+    Route::post('/delete-file', [BoardController::class, 'deleteBulkFile']);
+
 });
 
 Route::middleware('auth')->group(function () {

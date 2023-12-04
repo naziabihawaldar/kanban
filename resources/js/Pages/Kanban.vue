@@ -18,7 +18,6 @@ const importsData = computed(() => props.board?.data?.imports);
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
 const columnsWithOrder = ref([]);
-console.log(JSON.stringify(importsData.value));
 const onReorderChange = column => {
   console.log("called inside kanban for onReorderChange");
   // columnsWithOrder.value?.push(column);
@@ -38,6 +37,7 @@ const onReorderCommit = () => {
 //Add Modal
 const myDialog = ref(false);
 const filterDialog = ref(false);
+const deleteDialog = ref(false);
 
 const closeModal = () => {
   myDialog.value = false;
@@ -52,6 +52,12 @@ const closeFilterModal = () => {
 const openFilterModal = () => {
   filterDialog.value = true;
 };
+const closeDeleteModal = () => {
+  deleteDialog.value = false;
+};
+const openDeleteModal = () => {
+  deleteDialog.value = true;
+};
 
 //Import Form   
 const form = useForm({
@@ -60,6 +66,10 @@ const form = useForm({
   board_id: boardID,
 });
 
+const deleteForm = useForm({
+  fileId: '',
+})
+;
 const filterForm = useForm({
   board_id: boardID,
   assignee: '',
@@ -135,6 +145,21 @@ watch(filter_keyword, (v) => {
   filter_query(v);
 });
 
+const submitBulkDelete = () => {
+  
+  axios.post('/delete-file', deleteForm).then((res) => {
+    if (res.data.status == 'success') 
+    {
+      closeDeleteModal();
+      deleteForm.fileId = '';
+      snackbar_show.value = true;
+      snackbar_msg.value = "Successfully Deleted";
+      key_column.value = key_column.value ? false : true;
+    }
+  }).catch((error) => {
+    // console.log(error);
+  });
+}; 
 const submitFilter = () => {
   chipModal.value = false;
   var value = filter_select.value;
@@ -366,6 +391,8 @@ const columnReload = (obj) => {
         <v-col cols="6" align="right" class="text-right">
           <v-btn v-if="$page.props.auth.user.roles[0].name != 'user'" size="small" color="primary"
             @click="openModal">Import</v-btn>
+          <v-btn class="ml-3" v-if="$page.props.auth.user.roles[0].name != 'user'" size="small" color="red-darken-4"
+            @click="openDeleteModal">Bulk Delete</v-btn>
           <v-btn style="font-size: 22px;" size="small" @click="openFilterModal" class="ma-2" variant="text"
             icon="mdi mdi-filter-variant  " color="black-lighten-4"></v-btn>
         </v-col>
@@ -529,6 +556,31 @@ const columnReload = (obj) => {
               <v-spacer></v-spacer>
               <v-btn size="small" text="Close" @click="closeModal"></v-btn>
               <v-btn size="small" text="Submit" type="submit"></v-btn>
+            </v-card-actions>
+          </v-card>
+        </form>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog width="500" v-model="deleteDialog">
+      <v-card>
+        <form @submit.prevent="submitBulkDelete">
+          <v-card title="Bulk Delete">
+            <v-card-text class="pb-0">
+              <v-row>
+                <v-col cols="12">
+                  <div>
+                    <InputLabel for="name" value="Select File" />
+                    <v-select outlined label="Select" v-model="deleteForm.fileId"
+                    :items="importsData" item-title="name"  item-value="id"></v-select>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions class="pt-0">
+              <v-spacer></v-spacer>
+              <v-btn size="small" text="Close" @click="closeDeleteModal"></v-btn>
+              <v-btn size="small" color="red-darken-4" text="Delete" type="submit"></v-btn>
             </v-card-actions>
           </v-card>
         </form>

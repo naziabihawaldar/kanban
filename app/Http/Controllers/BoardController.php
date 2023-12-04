@@ -6,6 +6,7 @@ use App\Http\Resources\BoardResource;
 use App\Models\Board;
 use App\Models\Card;
 use App\Models\Column;
+use App\Models\Import;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
@@ -206,6 +207,32 @@ class BoardController extends Controller
         } catch (\Exception $e) {
             logger($e);
             return ['status'=> 'error'];
+        }
+    }
+
+    public function deleteBulkFile(Request $request)
+    {
+        try 
+        {
+            try 
+            {
+                $import_file = Import::find($request->fileId);
+                if($import_file)
+                {
+                    $cards = Card::where('import_id',$import_file->id)->exists();
+                    if(Card::where('import_id',$import_file->id)->exists())
+                    {
+                        Card::where('import_id',$import_file->id)->delete();
+                        Import::where('id',$import_file->id)->delete();   
+                    }
+                    return ['status' => 'success'];
+                }   
+            } catch (\Exception $e) {
+                logger($e);
+                return ['status'=> 'error'];
+            }
+        } catch (\Exception $e) {
+            logger($e);
         }
     }
 }

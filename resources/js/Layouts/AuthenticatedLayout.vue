@@ -39,7 +39,7 @@ const showingNavigationDropdown = ref(false);
                 :href="route('boards-list')"
                 :active="route().current('boards-list')"
               >
-                Kanban
+                Projects
               </NavLink>
               <NavLink
                 :href="route('reports')"
