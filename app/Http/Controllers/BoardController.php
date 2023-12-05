@@ -223,8 +223,9 @@ class BoardController extends Controller
                     if(Card::where('import_id',$import_file->id)->exists())
                     {
                         Card::where('import_id',$import_file->id)->delete();
-                        Import::where('id',$import_file->id)->delete();   
+                          
                     }
+                    Import::where('id',$import_file->id)->delete(); 
                     return ['status' => 'success'];
                 }   
             } catch (\Exception $e) {

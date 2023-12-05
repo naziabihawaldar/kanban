@@ -7,6 +7,8 @@ import Column from '@/Components/Kanban/Column.vue';
 import ColumnCreate from '@/Components/Kanban/ColumnCreate.vue';
 import ColumnByFilter from '@/Components/Kanban/ColumnByFilter.vue';
 import InputLabel from '@/Components/InputLabel.vue';
+import InputError from '@/Components/InputError.vue';
+
 const props = defineProps({
   board: Object,
 });
@@ -38,6 +40,7 @@ const onReorderCommit = () => {
 const myDialog = ref(false);
 const filterDialog = ref(false);
 const deleteDialog = ref(false);
+const error_msgs = ref('');
 
 const closeModal = () => {
   myDialog.value = false;
@@ -85,15 +88,24 @@ const filterForm = useForm({
 });
 
 const submit = () => {
+  error_msgs.value = '';
   form.post('/upload-board', {
+    onSuccess: (val) =>{
+      console.log(JSON.stringify(val));
+      // form.reset('file');
+      // form.file = [];
+      // form.name = '';
+      // error_msgs.value = '';
+      // myDialog.value = false;
+      // snackbar_show.value = true;
+      // snackbar_msg.value = "successfully uploaded";
+      // key_column.value = key_column.value ? false : true;
+    },
+    onError: (err) =>{
+      error_msgs.value = err;
+    },
     onFinish: () => {
-      form.reset('file');
-      form.file = [];
-      form.name = '';
-      myDialog.value = false;
-      snackbar_show.value = true;
-      snackbar_msg.value = "successfully uploaded";
-      key_column.value = key_column.value ? false : true;
+      
     },
   });
 };
@@ -532,16 +544,16 @@ const columnReload = (obj) => {
         <form @submit.prevent="submit">
           <v-card title="Import">
             <v-card-text class="pb-0">
+              <InputLabel for="Filename" value="File Name" />
               <v-text-field outlined label="Please Enter File name" v-model="form.name" :rules="[required]" clearable
                 density="compact"></v-text-field>
+                <InputError v-if="form.errors" class="mt-2" :message="form.errors.name" />
               <v-row>
                 <v-col cols="12">
-                  <div>
-                  </div>
-                </v-col>
-                <v-col cols="12">
-                  <v-file-input v-model="form.file" required variant="outlined" label="File input"
+                  <InputLabel for="File" value="File" />
+                  <v-file-input v-model="form.file" variant="outlined" label="File input"
                     density="compact"></v-file-input>
+                    <InputError v-if="form.errors" class="mt-2" :message="form.errors.file" />
                   <progress v-if="form.progress" :value="form.progress.percentage" max="100">{{ form.progress.percentage
                   }}%</progress>
                 </v-col>
@@ -553,8 +565,8 @@ const columnReload = (obj) => {
             </v-card-text>
             <v-card-actions class="pt-0">
               <v-spacer></v-spacer>
-              <v-btn size="small" text="Close" @click="closeModal"></v-btn>
-              <v-btn size="small" text="Submit" type="submit"></v-btn>
+              <v-btn size="small" text="Close" @click="closeModal" :disabled="form.processing"></v-btn>
+              <v-btn size="small" text="Submit" type="submit" :disabled="form.processing"></v-btn>
             </v-card-actions>
           </v-card>
         </form>
