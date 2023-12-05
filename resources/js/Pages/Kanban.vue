@@ -17,7 +17,6 @@ var obj = {};
 const columns = ref(props.board?.data?.columns);
 const boardTitle = computed(() => props.board?.data?.title);
 const importsData = computed(() => props.board?.data?.imports);
-console.log(JSON.stringify(importsData.value));
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
 const columnsWithOrder = ref([]);
@@ -98,6 +97,7 @@ const submit = () => {
           var file_path = res.data.data.file_path;
           console.log(">>>>>>>>>>>>>>>>"+file_path);
 
+          // download('http://localhost:8000/',file_path);
           download('https://tms.hoshey.com/',file_path);
          }
       }).catch((error) => {
@@ -122,7 +122,7 @@ const submit = () => {
   });
 };
 const download = (dataurl,file_name) => {
-    const url = dataurl+'/'+file_name;
+    const url = dataurl+''+file_name;
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', file_name);
