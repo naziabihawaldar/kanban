@@ -243,7 +243,7 @@ watch(due_date, (value) => {
     </form>
     <div v-else>
       <p class="text-sm">{{ cardContent }}</p>
-      <v-row>
+      <v-row class="pb-3">
         <v-col cols="12" class="pa-0 pt-2 pl-2">
           <div class="text-lg-left left-1 pt-2" style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: left;" v-if="card.due_date != null" v-html="formatDueDate(card.due_date)">
           </div>
@@ -552,7 +552,7 @@ watch(due_date, (value) => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" size="small" @click="closeDetailModal">Close</v-btn>
+        <v-btn color="primary" size="small" @click="closeDetailModal">Submit & Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
