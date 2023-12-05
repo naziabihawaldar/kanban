@@ -17,6 +17,7 @@ var obj = {};
 const columns = ref(props.board?.data?.columns);
 const boardTitle = computed(() => props.board?.data?.title);
 const importsData = computed(() => props.board?.data?.imports);
+console.log(JSON.stringify(importsData.value));
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
 const columnsWithOrder = ref([]);
@@ -91,15 +92,26 @@ const submit = () => {
   error_msgs.value = '';
   form.post('/upload-board', {
     onSuccess: (val) =>{
-      console.log(JSON.stringify(val));
-      // form.reset('file');
-      // form.file = [];
-      // form.name = '';
-      // error_msgs.value = '';
-      // myDialog.value = false;
-      // snackbar_show.value = true;
-      // snackbar_msg.value = "successfully uploaded";
-      // key_column.value = key_column.value ? false : true;
+      axios.get('/get-import-details', { params: { fileName: form.name,board_id: boardID.value } }).then((res) => {
+        if (res.data.status == 'success') {
+          console.log(JSON.stringify(res.data.data));
+          var file_path = res.data.data.file_path;
+          console.log(">>>>>>>>>>>>>>>>"+file_path);
+
+          download('https://tms.hoshey.com/',file_path);
+         }
+      }).catch((error) => {
+        // console.log(error);
+      })
+      // console.log(JSON.stringify(val));
+      form.reset('file');
+      form.file = [];
+      form.name = '';
+      error_msgs.value = '';
+      myDialog.value = false;
+      snackbar_show.value = true;
+      snackbar_msg.value = "successfully uploaded";
+      key_column.value = key_column.value ? false : true;
     },
     onError: (err) =>{
       error_msgs.value = err;
@@ -108,6 +120,14 @@ const submit = () => {
       
     },
   });
+};
+const download = (dataurl,file_name) => {
+    const url = dataurl+'/'+file_name;
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', file_name);
+    document.body.appendChild(link);
+    link.click();
 };
 
 const group_by_var = ref('');

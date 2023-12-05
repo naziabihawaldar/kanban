@@ -236,4 +236,17 @@ class BoardController extends Controller
             logger($e);
         }
     }
+
+    public function getFileDetails(Request $request)
+    {
+        try 
+        {
+            logger($request);
+            $file = Import::where('board_id',$request->board_id)->where('name',$request->fileName)->first();
+            return ['status' => 'success','message'=>'success','data'=>$file];
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status'=> 'error'];
+        }   
+    }
 }

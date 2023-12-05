@@ -32,11 +32,7 @@ class CardController extends Controller
                 logger("Invalid file");
             }
             if (isset($request->name) && $request->name != '') {
-                $importFile = new Import;
-                $importFile->name = $request->name;
-                $importFile->board_id = $board_id;
-                $importFile->uploaded_by = Auth::id();
-                $importFile->save();
+               
                 $six_digit_random_number = mt_rand(100000, 999999);
                 $file_name = $six_digit_random_number . 'import_logs';
                 $exp = explode('.', $file_name);
@@ -106,6 +102,13 @@ class CardController extends Controller
                         'upload error message'
                     ]);
                     $file_path = public_path() . '\\' . $create_file;
+                    $importFile = new Import;
+                    $importFile->name = $request->name;
+                    $importFile->board_id = $board_id;
+                    $importFile->file_path = $create_file;
+                    $importFile->uploaded_by = Auth::id();
+                    $importFile->save();
+
                     $data = Excel::import(new CardsImport($board_id, $importFile, $create_file), $file[0]);
 
                     $board = Board::find($board_id);
@@ -116,33 +119,6 @@ class CardController extends Controller
                         ->log('A file was imported by ' . Auth::user()->name);
                     // Process the uploaded file
                 }
-
-                /*
-                        $six_digit_random_number = mt_rand(100000, 999999);
-                        $file_name =$six_digit_random_number.'_local_station_import_logs';
-                        $exp=explode('.', $file_name);
-                        $create_file = $exp[0].'.csv';
-                        if(!file_exists($file_name))
-                        {
-
-                            $headers = array(
-                                "Content-type" => "text/csv",
-                                "Content-Disposition" => "attachment; filename=" . $create_file,
-                                "Pragma" => "no-cache",
-                                "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-                                "Expires" => "0"
-                            );
-                            $myfile = fopen($create_file, "a") or die("Unable to open file!");
-                            fputcsv($myfile, ['code', 'name', 'latitude', 'longitude', 'geofence', 'station_head', 'contact_desc','status','error message']);
-                            $file_path = public_path().'\\'.$create_file;
-                            \Excel::import(new LocalStations($create_file),'E:\shital\yatri\Panvel-BSR\local_stations.xlsx');
-                        }
-                */
-
-
-
-                // return back();
-
             }
             // return ['status' => 'success', 'message' => 'success'];
             // return back()->with(['name' => 'test']);

@@ -119,7 +119,11 @@ class CardsImport implements ToModel, WithHeadingRow
                             $role = Role::find(3);
                             $user->assignRole($role);
                         }
-                        $newRecord->users()->sync([$user->id]);
+                        
+                        if($user)
+                        {
+                            $newRecord->users()->sync([$user->id]);
+                        }
                     }
                     activity('create')
                         ->performedOn($newRecord) // Entry add in table. model name(subject_type) & id(subject_id)

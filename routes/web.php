@@ -80,9 +80,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/reports', [ReportController::class, 'index']);
     Route::get('/get-reports', [ReportController::class, 'getReportsData']);
+    
     Route::post('/reports/export', [ReportController::class, 'export']);
 
     Route::post('/delete-file', [BoardController::class, 'deleteBulkFile']);
+    Route::get('/get-import-details', [BoardController::class, 'getFileDetails']);
 
 });
 
