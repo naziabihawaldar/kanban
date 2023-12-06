@@ -29,7 +29,9 @@
                                 <td>
                                     <Link :href="`/boards/${board.id}`">{{ board.title }}</Link>
                                 </td>
-                                <td>{{ board.created_at }}</td>
+                                <td>
+                                    {{ moment(board.created_at).format('MMMM D,  YYYY') }} at {{ moment(board.created_at).format('hh:mm A') }}
+                                </td>
                             </tr>
                         </tbody>
                     </v-table>
@@ -69,6 +71,7 @@ import { Head, useForm, Link } from '@inertiajs/vue3';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
+import moment from 'moment';
 
 const addBoardDialog = ref(false);
 const snackbar_show = ref(false);

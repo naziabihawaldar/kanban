@@ -56,7 +56,6 @@ watch(board_id, (value) => {
     // filtersData.board_id = board_id.value;
    
     axios.post('/get-cards-based-on-filters', postData).then((res) => {
-        console.log("axios called");
         if (res.data.status == 'success') {
             columns.value = [];
             columns.value = res.data.data;
@@ -113,7 +112,7 @@ const reloadColumns = (obj) => {
                 </h3>
                 <MenuDropDown :menuItems="menuItems" />
             </div>
-            <div class="pb-3 flex-1 flex flex-col overflow-hidden">
+            <div class="pb-3 flex-1 flex flex-col overflow-hidden" v-if="column.cards.length != 0">
                 <div class="px-3 overflow-y-auto" ref="cardsRef">
                     <Draggable v-model="column.cards" group="cards" item-key="id" tag="ul" drag-class="drag" ghost-class="ghost"
                         class="space-y-3" @change="onReorderCards($event,column.id)" @end="onReorderEnds($event)">

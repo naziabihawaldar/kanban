@@ -102,6 +102,7 @@ class CardController extends Controller
                         'upload error message'
                     ]);
                     $file_path = public_path() . '\\' . $create_file;
+                    logger($file_path);
                     $importFile = new Import;
                     $importFile->name = $request->name;
                     $importFile->board_id = $board_id;

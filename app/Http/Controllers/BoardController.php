@@ -128,6 +128,18 @@ class BoardController extends Controller
         $todoColumn->title = 'To Do';
         $todoColumn->board_id = $board->id;
         $todoColumn->save();
+        $todoColumn =  new Column;
+        $todoColumn->title = 'Under Investigation';
+        $todoColumn->board_id = $board->id;
+        $todoColumn->save();
+        $todoColumn =  new Column;
+        $todoColumn->title = 'Delayed';
+        $todoColumn->board_id = $board->id;
+        $todoColumn->save();
+        $todoColumn =  new Column;
+        $todoColumn->title = 'Completed';
+        $todoColumn->board_id = $board->id;
+        $todoColumn->save();
 
         activity('create')
         ->performedOn($board) // Entry add in table. model name(subject_type) & id(subject_id)

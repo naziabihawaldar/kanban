@@ -93,10 +93,7 @@ const submit = () => {
     onSuccess: (val) =>{
       axios.get('/get-import-details', { params: { fileName: form.name,board_id: boardID.value } }).then((res) => {
         if (res.data.status == 'success') {
-          console.log(JSON.stringify(res.data.data));
           var file_path = res.data.data.file_path;
-          console.log(">>>>>>>>>>>>>>>>"+file_path);
-
           // download('http://localhost:8000/',file_path);
           download('https://tms.hoshey.com/',file_path);
          }
@@ -148,14 +145,17 @@ const filter_keyword = ref('');
 const filter_items = ref([]);
 const filter_data = ref([]);
 const filter_loading = ref(false);
-const filter_scan_date = ref(new Date());
+const filter_scan_date = ref();
 
 watch(filter_scan_date, (value) => {
-  var date = new Date(value);
-  const day = ('0' + date.getDate()).slice(-2);
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  filterForm.scan_date = year + '-' + month + '-' + day;
+  if(value != null){
+    var date = new Date(value);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    filterForm.scan_date = year + '-' + month + '-' + day;
+  }
+  
 });
 
 const filter_query = async (query) => {
@@ -201,7 +201,7 @@ const submitFilter = () => {
   }
 
   Object.keys(filterForm).forEach(function (key) {
-    console.log("<<<<<"+key);
+    // console.log("<<<<<"+filterForm[key]);
     if (key == 'severity' && filterForm[key] != '') {
       Object.assign(obj, { Severity: filterForm[key] });
     }
@@ -235,27 +235,13 @@ const submitFilter = () => {
   if (Object.keys(obj).length != 0) {
     chipModal.value = true;
   }
-  console.log(JSON.stringify(filterForm));
   closeFilterModal();
   callFilterAPI(filterForm);
 };
 
 function callFilterAPI(postData) {
   filter_data.value = postData;
-  // console.log(JSON.stringify(filter_data.value));
   key_column.value = key_column.value ? false : true;
-  /*axios.post('/get-cards-based-on-filters', postData).then((res) => {
-    if (res.data.status == 'success') {
-      columns.value = [];
-      columns.value = res.data.data;
-      comp_columns.value = res.data.data;
-      closeFilterModal();
-      nextTick();
-    }
-  }).catch((error) => {
-    // console.log(error);
-  });
-  */
 }
 
 function resetFilter(val) {
@@ -380,6 +366,9 @@ var getNameInitials = function (string) {
   return initials;
 };
 
+var onClear = function (v) {
+  console.log("onclear");
+};
 var required = function (v) {
   return !!v || 'Field is required'
 }
@@ -398,7 +387,7 @@ const columnReload = (obj) => {
 
 <template>
   <Head>
-    <title>Kanban Board</title>
+    <title>Task Management System</title>
   </Head>
 
   <AuthenticatedLayout>

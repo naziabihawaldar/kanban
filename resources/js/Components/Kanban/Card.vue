@@ -251,7 +251,7 @@ watch(due_date, (value) => {
         <v-col cols="6" class="pa-0 pl-2">
           <div class="text-lg-left left-1 pt-2" v-html="formatTaskID(card.id)"></div>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="6" class="pb-0">
           <div class="text-lg-right right-1">
             <template v-for="user in assign_users" :key="user.id">
               <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;float:right;">
@@ -543,6 +543,12 @@ watch(due_date, (value) => {
                         </template>
                       </Datepicker>
                     </v-col>
+                    <v-col cols="12" class="pa-0 pb-1" v-if="card.created_at">
+                      <span style="font-size: 14px;color: #333;">Created {{ moment(card.updated_at).format('MMMM D,  YYYY') }} at {{ moment(card.updated_at).format('hh:mm A') }}</span>
+                    </v-col>
+                    <v-col cols="12" class="pa-0" v-if="card.updated_at">
+                      <span style="font-size: 14px;color: #333;">Updated {{ moment(card.updated_at).format('MMMM D,  YYYY') }} at {{ moment(card.updated_at).format('hh:mm A') }}</span>
+                    </v-col>
                   </v-row>
                 </v-expansion-panel-text>
               </v-expansion-panel>
@@ -552,7 +558,7 @@ watch(due_date, (value) => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" size="small" @click="closeDetailModal">Submit & Close</v-btn>
+        <v-btn color="primary" size="small" @click="closeDetailModal">Save & Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

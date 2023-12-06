@@ -27,6 +27,7 @@ class TestCommand extends Command
      */
     public function handle()
     {
+        logger(storage_path());
         // $users = User::all();
         // foreach ($users as $user) 
         // {
