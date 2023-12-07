@@ -41,7 +41,7 @@
             <v-dialog width="500" v-model="addBoardDialog">
                 <v-card>
                     <form @submit.prevent="submit">
-                        <v-card title="Add Board">
+                        <v-card title="Add Project">
                             <v-card-text>
                                 <InputLabel for="title" value="Title" />
                                 <TextInput id="title" type="text" class="mt-1 block w-full" style="border: 1px solid black;"

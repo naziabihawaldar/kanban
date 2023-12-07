@@ -398,8 +398,6 @@ var clearBoardSearch = function () {
   filterForm.searchtxt = null;
   callFilterAPI(filterForm);
   key_column.value = key_column.value ? false : true;
-  
-  // callFilterAPI(filterForm);
 };
 
 var userFilter = function (user_name, user_id) {
