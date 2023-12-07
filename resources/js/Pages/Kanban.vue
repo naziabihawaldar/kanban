@@ -40,7 +40,9 @@ const onReorderCommit = () => {
 const myDialog = ref(false);
 const filterDialog = ref(false);
 const deleteDialog = ref(false);
+const searchloading = ref(false);
 const error_msgs = ref('');
+const boardSearch = ref('');
 
 const closeModal = () => {
   myDialog.value = false;
@@ -72,7 +74,7 @@ const form = useForm({
 const deleteForm = useForm({
   fileId: '',
 })
-;
+  ;
 const filterForm = useForm({
   board_id: boardID,
   assignee: '',
@@ -85,18 +87,19 @@ const filterForm = useForm({
   os_type: '',
   os_version: '',
   business_unit: '',
+  searchtxt: '',
 });
 
 const submit = () => {
   error_msgs.value = '';
   form.post('/upload-board', {
-    onSuccess: (val) =>{
-      axios.get('/get-import-details', { params: { fileName: form.name,board_id: boardID.value } }).then((res) => {
+    onSuccess: (val) => {
+      axios.get('/get-import-details', { params: { fileName: form.name, board_id: boardID.value } }).then((res) => {
         if (res.data.status == 'success') {
           var file_path = res.data.data.file_path;
           // download('http://localhost:8000/',file_path);
-          download('https://tms.hoshey.com/',file_path);
-         }
+          download('https://tms.hoshey.com/', file_path);
+        }
       }).catch((error) => {
         // console.log(error);
       })
@@ -110,21 +113,21 @@ const submit = () => {
       snackbar_msg.value = "successfully uploaded";
       key_column.value = key_column.value ? false : true;
     },
-    onError: (err) =>{
+    onError: (err) => {
       error_msgs.value = err;
     },
     onFinish: () => {
-      
+
     },
   });
 };
-const download = (dataurl,file_name) => {
-    const url = dataurl+''+file_name;
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', file_name);
-    document.body.appendChild(link);
-    link.click();
+const download = (dataurl, file_name) => {
+  const url = dataurl + '' + file_name;
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', file_name);
+  document.body.appendChild(link);
+  link.click();
 };
 
 const group_by_var = ref('');
@@ -148,15 +151,16 @@ const filter_loading = ref(false);
 const filter_scan_date = ref();
 
 watch(filter_scan_date, (value) => {
-  if(value != null){
+  if (value != null) {
     var date = new Date(value);
     const day = ('0' + date.getDate()).slice(-2);
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     filterForm.scan_date = year + '-' + month + '-' + day;
   }
-  
+
 });
+
 
 const filter_query = async (query) => {
   if (query != null && query.length > 1) {
@@ -171,15 +175,23 @@ const filter_query = async (query) => {
   }
 
 };
+watch(boardSearch, (query) => {
+  filterForm.searchtxt = '';
+  if(query != null)
+  {
+    filterForm.searchtxt = query;
+  }
+  callFilterAPI(filterForm);
+  
+});
+
 watch(filter_keyword, (v) => {
   filter_query(v);
 });
 
 const submitBulkDelete = () => {
-  
   axios.post('/delete-file', deleteForm).then((res) => {
-    if (res.data.status == 'success') 
-    {
+    if (res.data.status == 'success') {
       closeDeleteModal();
       deleteForm.fileId = '';
       snackbar_show.value = true;
@@ -190,7 +202,8 @@ const submitBulkDelete = () => {
   }).catch((error) => {
     // console.log(error);
   });
-}; 
+};
+
 const submitFilter = () => {
   chipModal.value = false;
   var value = filter_select.value;
@@ -226,7 +239,7 @@ const submitFilter = () => {
     if (key == 'business_unit' && filterForm[key] != '') {
       Object.assign(obj, { BusinessUnit: filterForm[key] });
     }
-    
+
     if (key == 'imports' && filterForm[key] != '') {
       Object.assign(obj, { Imports: filterForm[key] });
     }
@@ -356,6 +369,7 @@ const submitAssignee = () => {
     });
   }
 };
+
 var getNameInitials = function (string) {
   var names = string.split(' '),
     initials = names[0].substring(0, 1).toUpperCase();
@@ -380,9 +394,26 @@ var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688', '#795548'];
 const columnReload = (obj) => {
   key_column.value = key_column.value ? false : true;
 }
-// const rules = (value) =>{
-//     required: value => !!value || 'Field is required',
-// }
+var clearBoardSearch = function () {
+  filterForm.searchtxt = null;
+  callFilterAPI(filterForm);
+  key_column.value = key_column.value ? false : true;
+  
+  // callFilterAPI(filterForm);
+};
+
+var userFilter = function (user_name, user_id) {
+  Object.assign(obj, { Assignee: user_name });
+  if (Object.keys(obj).length != 0) {
+    chipModal.value = true;
+    filterForm.assignee = user_id;
+    callFilterAPI(filterForm);
+  } else {
+    key_column.value = key_column.value ? false : true;
+    columns.value = [];
+    columns.value = props.board?.data?.columns;
+  }
+};
 </script>
 
 <template>
@@ -396,11 +427,18 @@ const columnReload = (obj) => {
         <v-col cols="12" class="pl-3">
           <h1 class=" pt-3 font-bold text-xl">{{ boardTitle }}</h1>
         </v-col>
-        <v-col cols="6" align="left" class="text-left">
+        <v-col cols="2" align="left" class="text-left">
+          <div class="ml-6 mt-2 text-lg-left left-1">
+            <v-text-field  v-model="boardSearch" :loading="searchloading" density="compact" variant="outlined" label="Search this project"
+            append-inner-icon="mdi-magnify" single-line hide-details clearable  @click:clear="clearBoardSearch"></v-text-field>
+          </div>
+        </v-col>
+        <v-col cols="4" align="left" class="text-left">
           <div class="ml-6 text-lg-left left-1">
             <template v-for="boardAssignee in boardAssignees" :key="boardAssignee.id">
-              <v-avatar :color="colors[Math.floor(Math.random() * colors.length)]" class="mr-1"
-                style="width: 32px;height: 32px;font-size: 14px;margin-left: -10px;">
+              <v-avatar @click="userFilter(boardAssignee.name, boardAssignee.id)"
+                :color="colors[Math.floor(Math.random() * colors.length)]" class="mr-1"
+                style="width: 40px;height: 40px;font-size: 14px;margin-left: -10px;cursor: pointer;">
                 {{ getNameInitials(boardAssignee.name) }}
               </v-avatar>
             </template>
@@ -533,8 +571,8 @@ const columnReload = (obj) => {
               </v-col>
               <v-col cols="6" class="mt-4">
                 <InputLabel for="imports" value="Imports" />
-                <v-select outlined label="Select" v-model="filterForm.imports"
-                    :items="importsData" item-title="name"></v-select>
+                <v-select outlined label="Select" v-model="filterForm.imports" :items="importsData"
+                  item-title="name"></v-select>
               </v-col>
             </v-row>
 
@@ -556,13 +594,13 @@ const columnReload = (obj) => {
               <InputLabel for="Filename" value="File Name" />
               <v-text-field outlined label="Please Enter File name" v-model="form.name" :rules="[required]" clearable
                 density="compact"></v-text-field>
-                <InputError v-if="form.errors" class="mt-2" :message="form.errors.name" />
+              <InputError v-if="form.errors" class="mt-2" :message="form.errors.name" />
               <v-row>
                 <v-col cols="12">
                   <InputLabel for="File" value="File" />
                   <v-file-input v-model="form.file" variant="outlined" label="File input"
                     density="compact"></v-file-input>
-                    <InputError v-if="form.errors" class="mt-2" :message="form.errors.file" />
+                  <InputError v-if="form.errors" class="mt-2" :message="form.errors.file" />
                   <progress v-if="form.progress" :value="form.progress.percentage" max="100">{{ form.progress.percentage
                   }}%</progress>
                 </v-col>
@@ -591,8 +629,8 @@ const columnReload = (obj) => {
                 <v-col cols="12">
                   <div>
                     <InputLabel for="name" value="Select File" />
-                    <v-select outlined label="Select" v-model="deleteForm.fileId"
-                    :items="importsData" item-title="name"  item-value="id"></v-select>
+                    <v-select outlined label="Select" v-model="deleteForm.fileId" :items="importsData" item-title="name"
+                      item-value="id"></v-select>
                   </div>
                 </v-col>
               </v-row>

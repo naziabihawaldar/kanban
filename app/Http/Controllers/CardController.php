@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Board;
 use App\Models\Card;
+use App\Models\Column;
 use App\Models\Import;
 use App\Models\User;
 use Auth;
@@ -177,10 +178,13 @@ class CardController extends Controller
 
     public function getActivities(Request $request)
     {
-        try {
-            $card = new Card;
+        try 
+        {
+            $columns = Column::where('board_id',$request->board_id)->get();
             $activities = Activity::with('causer')->where('subject_id', $request->card_id)->orderByDesc('created_at')->get();
-            return ['status' => 'success', 'message' => 'success', 'data' => $activities];
+            $board = Board::find($request->board_id);
+            $board_user = $board->user;
+            return ['status' => 'success', 'message' => 'success', 'data' => $activities, 'columns' => $columns,'board_user' => $board_user];
         } catch (\Exception $e) {
             logger($e);
             return ['status' => 'error', 'message' => 'Error Occurred'];

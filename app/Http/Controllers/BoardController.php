@@ -62,13 +62,17 @@ class BoardController extends Controller
 
     public function getDetailsByFilter(Request $request) 
     {
-        
+        // logger($request);   
         $columns = Column::where('board_id', $request->board_id)->get();
         foreach ($columns as $column)
         {
             $cards = $column->cards()->with('users');
-            // $filters = $request->
             
+            if($request->has('searchtxt') && $request->searchtxt != '')
+            {
+                $cards = $cards->where('content', 'like', '%' . $request->searchtxt . '%');
+            }
+
             if($request->has('severity') && $request->severity != '')
             {
                 $cards = $cards->where('severity',$request->severity);
@@ -81,7 +85,6 @@ class BoardController extends Controller
             }
             if($request->has('imports') && $request->imports != '')
             {
-               
                 $cards = $cards->whereHas('import', function ($q) use ($request) {
                     $q->where('imports.name',  $request->imports);  
                 });
@@ -253,9 +256,32 @@ class BoardController extends Controller
     {
         try 
         {
-            logger($request);
             $file = Import::where('board_id',$request->board_id)->where('name',$request->fileName)->first();
             return ['status' => 'success','message'=>'success','data'=>$file];
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status'=> 'error'];
+        }   
+    }
+
+    public function updateColumn(Request $request)
+    {
+        try 
+        {
+            $column = Column::find($request->column_id);
+            if($column)
+            {
+                $card = Card::find($request->card_id);
+                if($card)
+                {
+                    $card->column_id = $column->id;
+                    $card->save();
+                    return ['status' => 'success','message'=>'success'];
+                }
+                return ['status'=> 'error','message'=>'card not found'];
+            }
+            return ['status'=> 'error','message'=>'column not found'];
+            
         } catch (\Exception $e) {
             logger($e);
             return ['status'=> 'error'];

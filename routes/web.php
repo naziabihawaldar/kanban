@@ -84,6 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reports/export', [ReportController::class, 'export']);
 
     Route::post('/delete-file', [BoardController::class, 'deleteBulkFile']);
+    Route::post('/update-column', [BoardController::class, 'updateColumn']);
     Route::get('/get-import-details', [BoardController::class, 'getFileDetails']);
 
 });

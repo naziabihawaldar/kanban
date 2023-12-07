@@ -13,16 +13,17 @@ const props = defineProps({
   card: Object,
   boardTitle: String,
 });
-// console.log(props?.card?.board);
 // TODO: Move to composable useModal
 const isOpen = ref(false);
 const board_title = ref(props.boardTitle);
 const isDialogOpen = ref(false);
 const panel = ref([0]);
 const history = ref([]);
+const columns = ref([]);
 const emit = defineEmits(['onReloadColumns'])
 const openModal = () => (isOpen.value = true);
 const inputCardContentRef = ref();
+const boardCreator = ref();
 
 const closeModal = confirm => {
   isOpen.value = false;
@@ -40,7 +41,6 @@ const form = useForm({
   content: props?.card?.content,
 });
 
-
 const isEditing = computed(
   () => props?.card?.id === useEditCard?.value?.currentCard
 );
@@ -49,6 +49,7 @@ const cardContent = computed(() => props.card?.content);
 const assign_users = computed(() => props.card?.users);
 const comments = computed(() => props.card?.comments);
 const card_id = computed(() => props.card?.id);
+const board_id = computed(() => props.card?.board_id);
 const onSubmit = () => {
   form.post(
     route('columns.cards.update', {
@@ -80,10 +81,14 @@ const showForm = async () => {
 const openDetailModal = () => {
   isDialogOpen.value = true;
   axios.post('/get-activities', {
-    card_id: card_id.value
+    card_id: card_id.value,
+    board_id: board_id.value,
   }).then((res) => {
     if (res.data.status == 'success') {
       history.value = res.data.data;
+      columns.value = res.data.columns;
+      selectedColumn.value = (props?.card?.column_id != null) ? props?.card?.column_id : '';
+      boardCreator.value = res.data.board_user;
     }
   }).catch((error) => {
 
@@ -104,8 +109,10 @@ const data = reactive({
 //Demo
 const select = ref(null);
 const keyword = ref('');
+const selectedColumn = ref('');
 const items = ref([]);
 const loading = ref(false);
+const columnDisabled = ref(false);
 const start_date = ref((props?.card?.start_date != null) ? new Date(props?.card?.start_date) : null);
 const end_date = ref((props?.card?.end_date != null) ? new Date(props?.card?.end_date) : null);
 const due_date = ref((props?.card?.due_date != null) ? new Date(props?.card?.due_date) : null);
@@ -125,9 +132,22 @@ const query = async (_keyword) => {
       data.message = 'Nothing found!';
     }
   }
-
 };
 
+watch(selectedColumn, (value) => {
+  columnDisabled.value = true;
+  if (value != null) {
+    axios.post('/update-column', {
+      card_id: card_id.value,
+      column_id: value
+    }).then((res) => {
+      if (res.data.status == "success") {
+        columnDisabled.value = false;
+      }
+    }).catch((error) => {
+    })
+  }
+});
 watch(select, (value) => {
   if (value !== null && typeof value === 'object') {
     axios.post('/assign-card', {
@@ -147,6 +167,7 @@ watch(select, (value) => {
 watch(keyword, (v) => {
   query(v);
 });
+
 var getInitials = function (string) {
   var names = string.split(' '),
     initials = names[0].substring(0, 1).toUpperCase();
@@ -157,28 +178,27 @@ var getInitials = function (string) {
   return initials;
 };
 
-var padZeros = function(number, length){
+var padZeros = function (number, length) {
   var str = '' + number;
   while (str.length < length) {
     str = '0' + str;
   }
   return str;
 };
-var formatTaskID = function(ID){
+var formatTaskID = function (ID) {
   var spanHTML = '';
-  spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;color:var(--ds-text-subtle,#7a869a);font-weight: 600;font-size: 10pt;line-height:10px"><span class="mdi mdi-checkbox-marked" style="font-size:20px;font-weight:700;padding-right:5px;color:#4BADE8;vertical-align:top;"></span>'+getInitials(board_title.value)+''+padZeros(ID,4)+'</div>';
+  spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;color:var(--ds-text-subtle,#7a869a);font-weight: 600;font-size: 10pt;line-height:10px"><span class="mdi mdi-checkbox-marked" style="font-size:20px;font-weight:700;padding-right:5px;color:#4BADE8;vertical-align:top;"></span>' + getInitials(board_title.value) + '' + padZeros(ID, 4) + '</div>';
   return spanHTML;
 };
-var formatDueDate = function(dueDate){
+var formatDueDate = function (dueDate) {
   var spanHTML = '';
   const currentDate = new Date();
   const inputDate = new Date(dueDate);
-  if(currentDate > inputDate)
-  {
-    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-danger, #FFEBE6);color:var(--ds-text-accent-red, #DE350B)"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
-  }else{
-    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-neutral, #F4F5F7);color:var(--ds-text-subtle, #42526E);"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>'+moment(dueDate).format('D MMM YY')+'</div>';
-    
+  if (currentDate > inputDate) {
+    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-danger, #FFEBE6);color:var(--ds-text-accent-red, #DE350B)"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>' + moment(dueDate).format('D MMM YY') + '</div>';
+  } else {
+    spanHTML = '<div class="pl-1 pr-1" style="display:inline-block;background:var(--ds-background-neutral, #F4F5F7);color:var(--ds-text-subtle, #42526E);"><span class="mdi mdi-calendar-month-outline" style="font-size:14px;font-weight:700;line-height:16px;padding-right:5px;"></span>' + moment(dueDate).format('D MMM YY') + '</div>';
+
   }
   return spanHTML;
 };
@@ -245,7 +265,9 @@ watch(due_date, (value) => {
       <p class="text-sm">{{ cardContent }}</p>
       <v-row class="pb-3">
         <v-col cols="12" class="pa-0 pt-2 pl-2">
-          <div class="text-lg-left left-1 pt-2" style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: left;" v-if="card.due_date != null" v-html="formatDueDate(card.due_date)">
+          <div class="text-lg-left left-1 pt-2"
+            style="font-size: 11px;font-weight: 700;line-height: 16px;text-align: left;" v-if="card.due_date != null"
+            v-html="formatDueDate(card.due_date)">
           </div>
         </v-col>
         <v-col cols="6" class="pa-0 pl-2">
@@ -499,6 +521,13 @@ watch(due_date, (value) => {
             </v-row>
           </v-col>
           <v-col cols="4">
+            <v-row>
+              <v-col cols="6">
+                <v-select v-model="selectedColumn" :items="columns" item-title="title" item-value="id" density="compact"
+                  variant="outlined" :disabled="columnDisabled"></v-select>
+              </v-col>
+            </v-row>
+
             <v-expansion-panels v-model="panel">
               <v-expansion-panel class="pa-0">
                 <v-expansion-panel-title class="pa-2"
@@ -509,7 +538,7 @@ watch(due_date, (value) => {
                       <b class="accent--text" style="font-size:14px">Assignee</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-                      <v-combobox outlined clearable chips color="green " v-model:search="keyword" no-filter
+                      <v-combobox variant="outlined" clearable chips color="green " v-model:search="keyword" no-filter
                         v-model="select" :items="items" :loading="loading" item-title="name" item-value="id" return-object
                         @focus="() => query(keyword)" />
                     </v-col>
@@ -543,16 +572,27 @@ watch(due_date, (value) => {
                         </template>
                       </Datepicker>
                     </v-col>
-                    <v-col cols="12" class="pa-0 pb-1" v-if="card.created_at">
-                      <span style="font-size: 14px;color: #333;">Created {{ moment(card.updated_at).format('MMMM D,  YYYY') }} at {{ moment(card.updated_at).format('hh:mm A') }}</span>
-                    </v-col>
-                    <v-col cols="12" class="pa-0" v-if="card.updated_at">
-                      <span style="font-size: 14px;color: #333;">Updated {{ moment(card.updated_at).format('MMMM D,  YYYY') }} at {{ moment(card.updated_at).format('hh:mm A') }}</span>
+                    <v-col cols="12" class="pl-0 pt-3 pb-3">
+                      Reporter<br>
+                      <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;float:right;">
+                        {{ getInitials(boardCreator.name) }}
+                      </v-avatar>
+                      {{ boardCreator.name }}
                     </v-col>
                   </v-row>
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
+            <v-row class="pt-4 pl-3">
+              <v-col cols="12" class="pa-0 pb-1" v-if="card.created_at">
+                <span style="font-size: 14px;color: #333;">Created {{ moment(card.updated_at).format('MMMM D, YYYY') }} at
+                  {{ moment(card.updated_at).format('hh:mm A') }}</span>
+              </v-col>
+              <v-col cols="12" class="pa-0" v-if="card.updated_at">
+                <span style="font-size: 14px;color: #333;">Updated {{ moment(card.updated_at).format('MMMM D, YYYY') }} at
+                  {{ moment(card.updated_at).format('hh:mm A') }}</span>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-card-text>
