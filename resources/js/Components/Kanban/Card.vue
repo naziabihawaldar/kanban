@@ -572,9 +572,9 @@ watch(due_date, (value) => {
                         </template>
                       </Datepicker>
                     </v-col>
-                    <v-col cols="12" class="pl-0 pt-3 pb-3">
+                    <v-col cols="12" class="pl-0 pt-3 pb-3" v-if="boardCreator">
                       Reporter<br>
-                      <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;float:right;">
+                      <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;float:right;" >
                         {{ getInitials(boardCreator.name) }}
                       </v-avatar>
                       {{ boardCreator.name }}
