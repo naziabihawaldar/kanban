@@ -17,6 +17,8 @@ use App\Http\Controllers\ApiController;
 
 
 Route::post('/login', [ApiController::class, 'login']);
+Route::get('/get-projects', [ApiController::class, 'getProjects']);
+Route::get('/get-tasks', [ApiController::class, 'getTasks']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
