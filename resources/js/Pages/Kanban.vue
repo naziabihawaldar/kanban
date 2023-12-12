@@ -511,15 +511,10 @@ var getNameInitials = function (string) {
   return initials;
 };
 
-var onClear = function (v) {
-  console.log("onclear");
-};
 var required = function (v) {
   return !!v || 'Field is required'
 }
-// var color_arrays = ['#DE350B','#DE350B'];
 
-// var random = color_arrays.random();
 var colors = ['#9C27B0', '#E91E63', '#673AB7', '#3F51B5', '#009688', '#795548'];
 
 const columnReload = (obj) => {

@@ -7,6 +7,8 @@ import { TrashIcon } from '@heroicons/vue/24/solid';
 import { useEditCard } from '@/Composables/useEditCard';
 import ConfirmDialog from '@/Components/Kanban/ConfirmDialog.vue';
 import Comment from '@/Components/Kanban/Comment.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import InputError from '@/Components/InputError.vue';
 import { Logger } from 'sass';
 import moment from 'moment';
 const props = defineProps({
@@ -69,11 +71,7 @@ const onCancel = () => {
   form.reset();
 };
 
-const showForm = async () => {
-  useEditCard.value.currentCard = props?.card?.id;
-  await nextTick(); // wait for form to be rendered
-  inputCardContentRef.value.focus();
-};
+
 
 //Details
 // const openDetailModal = () => ();
@@ -240,6 +238,213 @@ watch(due_date, (value) => {
     // console.log(error);
   })
 });
+
+
+const editTaskDialog = ref(false);
+const editTaskLoading = ref(false);
+const editTask_filter_loading = ref(false);
+const editTask_filter_items = ref([]);
+const editTask_scan_date = ref();
+const editTask_start_date = ref();
+const editTask_end_date = ref();
+const editTask_due_date = ref();
+const editTask_filter_select = ref(null);
+const editTask_keyword = ref('');
+const editTaskForm = useForm({
+  board_id: '',
+  card_id: '',
+  vulnerabilityName: '',
+  vulnerabilityID: '',
+  description: '',
+  vulnerabilityDetails: '',
+  asset_ip: '',
+  ip_and_vuln_id: '',
+  port: '',
+  protocol: '',
+  os_type: '',
+  os_version: '',
+  business_unit: '',
+  class: '',
+  cve_id: '',
+  cvss_score: '',
+  severity: '',
+  solution: '',
+  impact_of_vulnerability: '',
+  scan_date_time: '',
+  background: '',
+  service: '',
+  remediation: '',
+  references: '',
+  exception: '',
+  tags: '',
+  asset_version: '',
+  model: '',
+  make: '',
+  asset_type: '',
+  host_name: '',
+  PLK_VLAN10_POS_SICOM_Subnet: '',
+  PLK_VLAN70_Kiosk_Subnet: '',
+  PLK_VLAN254_Meraki_Management_Subnet: '',
+  PLK_VLAN4_Subnet: '',
+  BK_VLAN10_POS_SICOM_Subnet: '',
+  BK_VLAN70_Kiosk_Subnet: '',
+  BK_VLAN254_Meraki_Management_Subnet: '',
+  BK_VLAN4_Subnet: '',
+  THS_VLAN10_POS_SICOM_Subnet: '',
+  THS_VLAN70_Kiosk_Subnet: '',
+  THS_VLAN254_Meraki_Management_Subnet: '',
+  THS_VLAN4_Subnet: '',
+  assignee: '',
+  start_date: '',
+  end_date: '',
+  due_date: '',
+});
+watch(editTask_keyword, (v) => {
+  editTask_filter_query(v);
+});
+const editTask_filter_query = async (query) => {
+  if (query != null && query.length > 1) {
+    editTask_filter_loading.value = true;
+    const response = await axios.post('/search-user', {
+      query: query
+    });
+    if (response.data.length) {
+      editTask_filter_items.value = response.data;
+      editTask_filter_loading.value = false;
+    }
+  }
+
+};
+const closeEditModal = () => {
+  editTaskDialog.value = false;
+};
+const openEditModal = () => {
+  editTaskDialog.value = true;
+};
+watch(editTask_start_date, (value) => {
+  if (value != null) {
+    var date = new Date(value);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    editTaskForm.start_date = year + '-' + month + '-' + day;
+  }
+});
+watch(editTask_end_date, (value) => {
+  if (value != null) {
+    var date = new Date(value);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    editTaskForm.end_date = year + '-' + month + '-' + day;
+  }
+});
+watch(editTask_due_date, (value) => {
+  if (value != null) {
+    var date = new Date(value);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    editTaskForm.due_date = year + '-' + month + '-' + day;
+  }
+});
+watch(editTask_scan_date, (value) => {
+  if (value != null) {
+    var date = new Date(value);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    editTaskForm.scan_date_time = year + '-' + month + '-' + day;
+  }
+});
+const submitEditTask = () => {
+  var value = editTask_filter_select.value;
+  if (value !== null && typeof value === 'object') 
+  {
+    editTaskForm.assignee = value.id;
+  }
+  editTaskForm.post('/update-task', {
+    preserveScroll: true,
+    onStart: () => {editTaskLoading.value = true;},
+    onSuccess: (val) => {
+      editTaskForm.reset();
+      editTask_filter_select.value = null;
+      closeEditModal();
+      // key_column.value = key_column.value ? false : true;
+    },
+    onError: (err) => {},
+    onFinish: () => {
+      editTaskLoading.value = false;
+      emit('onReloadColumns');
+    },
+  });
+}
+const showForm = async (cardContent) => {
+  editTaskForm.reset();
+  editTaskForm.board_id = cardContent.board_id;
+  editTaskForm.card_id = cardContent.id;
+  editTaskForm.vulnerabilityName = cardContent.vulnerability_title;
+  editTaskForm.vulnerabilityID = cardContent.vulnerability_id;
+  editTaskForm.description = cardContent.content;
+  editTaskForm.vulnerabilityDetails = cardContent.vulnerability_details;
+  editTaskForm.ip_and_vuln_id = cardContent.ip_and_vuln_id;
+  editTaskForm.asset_ip = cardContent.asset_ip;
+  editTaskForm.port = cardContent.port;
+  editTaskForm.protocol = cardContent.protocol;
+  editTaskForm.os_type = cardContent.os_type;
+  editTaskForm.os_version = cardContent.os_version;
+  editTaskForm.business_unit = cardContent.business_unit;
+  editTaskForm.class = cardContent.class;
+  editTaskForm.cve_id = cardContent.cve_id;
+  editTaskForm.cvss_score = cardContent.cvss_score;
+  editTaskForm.severity = cardContent.severity;
+  editTaskForm.solution = cardContent.solution;
+  editTaskForm.impact_of_vulnerability = cardContent.impact_of_vulnerability;
+  editTaskForm.scan_date_time = cardContent.scan_date_time;
+  editTask_scan_date.value = new Date(cardContent.scan_date_time);
+  editTaskForm.background = cardContent.background;
+  editTaskForm.service = cardContent.service;
+  editTaskForm.remediation = cardContent.remediation;
+  editTaskForm.references = cardContent.references;
+  editTaskForm.exception = cardContent.exception;
+  editTaskForm.tags = cardContent.tags;
+  editTaskForm.asset_version = cardContent.asset_version;
+  editTaskForm.model = cardContent.model;
+  editTaskForm.make = cardContent.make;
+  editTaskForm.host_name = cardContent.host_name;
+  editTaskForm.asset_type = cardContent.asset_type;
+  editTaskForm.PLK_VLAN10_POS_SICOM_Subnet = cardContent.PLK_VLAN10_POS_SICOM_Subnet;
+  editTaskForm.PLK_VLAN70_Kiosk_Subnet = cardContent.PLK_VLAN70_Kiosk_Subnet;
+  editTaskForm.PLK_VLAN254_Meraki_Management_Subnet = cardContent.PLK_VLAN254_Meraki_Management_Subnet;
+  editTaskForm.PLK_VLAN4_Subnet = cardContent.PLK_VLAN4_Subnet;
+  editTaskForm.BK_VLAN70_Kiosk_Subnet = cardContent.BK_VLAN70_Kiosk_Subnet;
+  editTaskForm.BK_VLAN10_POS_SICOM_Subnet = cardContent.BK_VLAN10_POS_SICOM_Subnet;
+  editTaskForm.BK_VLAN254_Meraki_Management_Subnet = cardContent.BK_VLAN254_Meraki_Management_Subnet;
+  editTaskForm.BK_VLAN4_Subnet = cardContent.BK_VLAN4_Subnet;
+  editTaskForm.THS_VLAN10_POS_SICOM_Subnet = cardContent.THS_VLAN10_POS_SICOM_Subnet;
+  editTaskForm.THS_VLAN70_Kiosk_Subnet = cardContent.THS_VLAN70_Kiosk_Subnet;
+  editTaskForm.THS_VLAN254_Meraki_Management_Subnet = cardContent.THS_VLAN254_Meraki_Management_Subnet;
+  editTaskForm.THS_VLAN4_Subnet = cardContent.THS_VLAN4_Subnet;
+  editTaskForm.start_date = cardContent.start_date;
+  editTaskForm.end_date = cardContent.end_date;
+  editTaskForm.due_date = cardContent.due_date;
+  editTask_start_date.value = cardContent.start_date != null ? new Date(cardContent.start_date): null;
+  editTask_end_date.value = cardContent.end_date != null? new Date(cardContent.end_date): null;
+  editTask_due_date.value = cardContent.due_date != null? new Date(cardContent.due_date): null;
+  if(cardContent.users.length == 1)
+  {
+    var assignee = cardContent.users[0];
+    editTask_filter_select.value = assignee.id;
+    editTask_filter_items.value = cardContent.users;
+  }
+  await nextTick();
+  openEditModal()
+  // useEditCard.value.currentCard = props?.card?.id;
+  // await nextTick(); // wait for form to be rendered
+  // inputCardContentRef.value.focus();
+
+};
+
 </script>
 
 <template>
@@ -283,12 +488,13 @@ watch(due_date, (value) => {
           </div>
         </v-col>
       </v-row>
+      <!-- @click.prevent="showForm" -->
       <div class="hidden absolute right-1 inset-0 group-hover:flex justify-end space-x-2 items-center">
-        <button @click.prevent="showForm"
+        <button @click.stop.prevent="showForm(card)"
           class="w-8 h-8 bg-gray-50 text-gray-600 hover:text-black hover:bg-gray-200 rounded-md grid place-content-center">
           <PencilIcon class="w-5 h-5" />
         </button>
-        <button @click.prevent="openModal"
+        <button @click.stop.prevent="openModal"
           class="w-8 h-8 bg-gray-50 text-red-600 hover:text-red-700 hover:bg-gray-200 rounded-md grid place-content-center">
           <TrashIcon class="w-5 h-5" />
         </button>
@@ -574,7 +780,7 @@ watch(due_date, (value) => {
                     </v-col>
                     <v-col cols="12" class="pl-0 pt-3 pb-3" v-if="boardCreator">
                       Reporter<br>
-                      <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;float:right;" >
+                      <v-avatar color="blue" style="width:22px;height:22px;font-size:10px;float:right;">
                         {{ getInitials(boardCreator.name) }}
                       </v-avatar>
                       {{ boardCreator.name }}
@@ -601,5 +807,410 @@ watch(due_date, (value) => {
         <v-btn color="primary" size="small" @click="closeDetailModal">Save & Close</v-btn>
       </v-card-actions>
     </v-card>
+  </v-dialog>
+
+  <v-dialog persistent width="800" v-model="editTaskDialog">
+    <form @submit.prevent="submitEditTask">
+      <v-card title="Edit Task">
+        <v-card-text>
+          <v-row>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Vulnerability Name*" />
+                <v-text-field variant="outlined" density="compact" class="mt-2" v-model="editTaskForm.vulnerabilityName"
+                  hide-details required></v-text-field>
+                <InputError v-if="form.errors" class="mt-2" :message="editTaskForm.errors.vulnerabilityName" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Vulnerability ID*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.vulnerabilityID" hide-details></v-text-field>
+                <InputError v-if="form.errors" class="mt-2" :message="editTaskForm.errors.vulnerabilityID" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pt-0">
+              <div>
+                <InputLabel value="Vulnerability Description*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.description" hide-details></v-text-field>
+                <InputError v-if="form.errors" class="mt-2" :message="editTaskForm.errors.description" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pt-0">
+              <div>
+                <InputLabel value="Vulnerability Details*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.vulnerabilityDetails" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.vulnerabilityDetails" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pt-0">
+              <div>
+                <InputLabel value="Asset IP*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.asset_ip"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.asset_ip" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pt-0">
+              <div>
+                <InputLabel value="IP & Vuln Id*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.ip_and_vuln_id" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.ip_and_vuln_id" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Port*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.port"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.port" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Protocol*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.protocol"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.protocol" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="OS Type/Version*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.os_type"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.os_type" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Os Version*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.os_version"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.os_version" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Business Unit*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.business_unit" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.business_unit" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Class*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.class"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.class" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="CVE ID*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.cve_id"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.cve_id" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="CVSS Score*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.cvss_score"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.cvss_score" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pb-0">
+              <div>
+                <InputLabel value="Severity*" />
+                <v-select variant="outlined" density="compact" class="mt-2" required v-model="editTaskForm.severity"
+                  :items="['Critical', 'High', 'Medium', 'Low', 'Informational', 'None']"></v-select>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.severity" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pb-0">
+              <div>
+                <InputLabel value="Solution*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.solution"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.solution" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Impact Of Vulnerabilty*" />
+                <v-text-field variant="outlined" density="compact" class="mt-2" required
+                  v-model="editTaskForm.impact_of_vulnerability" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.impact_of_vulnerability" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Scan Date Time*" />
+                <Datepicker class="w-100 mt-2" variant="outlined" density="compact"
+                  style="border: 1px solid #6b7280;border-radius:5px;" v-model="editTask_scan_date">
+                  <template v-slot:clear="{ onClear }">
+                    <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                  </template>
+                </Datepicker>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.scan_date_time" />
+
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Background*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.background"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.background" />
+
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Service*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.service"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.service" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Remediation*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.remediation" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.remediation" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="References*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.references"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.references" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Exception*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.exception"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.exception" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Tags*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.tags"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.tags" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Asset Version*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.asset_version" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.asset_version" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Model*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.model"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.model" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Make*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.make"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.make" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Asset Type*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.asset_type"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.asset_type" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="Host Name*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2" v-model="editTaskForm.host_name"
+                  hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.host_name" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="PLK_VLAN10 (POS-SICOM) Subnet*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.PLK_VLAN10_POS_SICOM_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.PLK_VLAN10_POS_SICOM_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="PLK_VLAN70 (Kiosk)*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.PLK_VLAN70_Kiosk_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.PLK_VLAN70_Kiosk_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="PLK_VLAN254 (Meraki-Management)*" />
+                <v-text-field variant="outlined" density="compact" class="mt-2" required
+                  v-model="editTaskForm.PLK_VLAN254_Meraki_Management_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.PLK_VLAN254_Meraki_Management_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="PLK_VLAN4 Subnet*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.PLK_VLAN4_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.PLK_VLAN4_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="BK_VLAN10 (POS-SICOM) Subnet*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.BK_VLAN10_POS_SICOM_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.BK_VLAN10_POS_SICOM_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="BK_VLAN70 (Kiosk)*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.BK_VLAN70_Kiosk_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.BK_VLAN70_Kiosk_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="BK_VLAN254 (Meraki-Management)*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.BK_VLAN254_Meraki_Management_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.BK_VLAN254_Meraki_Management_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="BK_VLAN4 Subnet*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.BK_VLAN4_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.BK_VLAN4_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="THS_VLAN10 (POS-SICOM) Subnet*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.THS_VLAN10_POS_SICOM_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.THS_VLAN10_POS_SICOM_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="THS_VLAN70 (Kiosk)*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.THS_VLAN70_Kiosk_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.THS_VLAN70_Kiosk_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6">
+              <div>
+                <InputLabel value="THS_VLAN254 (Meraki-Management)*" />
+                <v-text-field variant="outlined" density="compact" required class="mt-2"
+                  v-model="editTaskForm.THS_VLAN254_Meraki_Management_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2"
+                  :message="editTaskForm.errors.THS_VLAN254_Meraki_Management_Subnet" />
+
+              </div>
+            </v-col>
+            <v-col cols="6" class="pb-0">
+              <div>
+                <InputLabel value="THS_VLAN4 Subnet*" />
+                <v-text-field variant="outlined" required density="compact" class="mt-2"
+                  v-model="editTaskForm.THS_VLAN4_Subnet" hide-details></v-text-field>
+                <InputError v-if="editTaskForm.errors" class="mt-2" :message="editTaskForm.errors.THS_VLAN4_Subnet" />
+              </div>
+            </v-col>
+            <v-col cols="6" class="pb-0">
+              <div>
+                <InputLabel value="Assignee Name" />
+                <v-combobox variant="outlined" density="compact" clearable chips color="green "
+                  v-model:search="editTask_keyword" no-filter v-model="editTask_filter_select" :items="editTask_filter_items"
+                  :loading="editTask_filter_loading" item-title="name" item-value="id" class="mt-2"
+                @focus="() => editTask_filter_query(keyword)" />
+            </div>
+          </v-col>
+          <v-col cols="6" class="pt-0">
+            <div>
+              <InputLabel value="Start Date" />
+              <Datepicker variant="outlined" required density="compact"
+                style="border: 1px solid #6b7280;border-radius:5px;" class="mt-2 w-100" v-model="editTask_start_date">
+                <template v-slot:clear="{ onClear }">
+                  <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                </template>
+              </Datepicker>
+            </div>
+          </v-col>
+          <v-col cols="6" class="pt-0">
+            <div>
+              <InputLabel value="End Date" />
+              <Datepicker variant="outlined" required density="compact" class="mt-2 w-100"
+                style="border: 1px solid #6b7280;border-radius:5px;" v-model="editTask_end_date">
+                <template v-slot:clear="{ onClear }">
+                  <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                </template>
+              </Datepicker>
+            </div>
+          </v-col>
+          <v-col cols="6">
+            <div>
+              <InputLabel value="Due Date" />
+              <Datepicker variant="outlined" class="mt-2 w-100" required density="compact"
+                style="border: 1px solid #6b7280;border-radius:5px;" v-model="editTask_due_date">
+                <template v-slot:clear="{ onClear }">
+                  <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                </template>
+              </Datepicker>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn size="small" variant="outlined" color="red-darken-4" text="Close" :loading="editTaskLoading"
+          :disabled="editTaskLoading" @click="closeEditModal"></v-btn>
+        <v-btn size="small" variant="outlined" color="green-darken-3" :loading="editTaskLoading"
+          :disabled="editTaskLoading" text="Submit" type="submit"></v-btn>
+      </v-card-actions>
+    </v-card>
+  </form>
   </v-dialog>
 </template>

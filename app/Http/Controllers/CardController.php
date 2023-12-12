@@ -237,13 +237,13 @@ class CardController extends Controller
 
         $start_date = $end_date = $due_date = null;
         if (isset($request->start_date) && $request->start_date != null) {
-            $start_date = \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($request->start_date))->format('Y-m-d');
+            $start_date = \Carbon\Carbon::createFromFormat('Y-m-d', $request->start_date)->toDateString();
         }
         if (isset($request->end_date) && $request->end_date != null) {
-            $end_date = \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($request->end_date))->format('Y-m-d');
+            $end_date = \Carbon\Carbon::createFromFormat('Y-m-d', $request->end_date)->toDateString();
         }
         if (isset($request->due_date) && $request->due_date != null) {
-            $due_date = \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($request->due_date))->format('Y-m-d');
+            $due_date = \Carbon\Carbon::createFromFormat('Y-m-d', $request->due_date)->toDateString();
         }
 
         $board = Board::find($request->board_id);
@@ -261,16 +261,15 @@ class CardController extends Controller
             }
                 $card->board_id = $board->id;
                 $card->vulnerability_id = $request->vulnerabilityID;
-                $card->asset_ip = $request->asset_ip;
                 $card->content = $request->description;
                 $card->vulnerability_title = $request->vulnerabilityName;
                 $card->vulnerability_desc = $request->description;
                 $card->vulnerability_details = $request->vulnerabilityDetails;
                 $card->asset_ip = $request->asset_ip;
-                $card->ip_and_vuln_id = $request->ip_vuln_id;
+                $card->ip_and_vuln_id = $request->ip_and_vuln_id;
                 $card->port = $request->port;
                 $card->protocol = $request->protocol;
-                $card->os_type = $request->os_typeversion;
+                $card->os_type = $request->os_type;
                 $card->os_version = $request->os_version;
                 $card->business_unit = $request->business_unit;
                 $card->class = $request->class;
@@ -278,7 +277,7 @@ class CardController extends Controller
                 $card->cvss_score = $request->cvss_score;
                 $card->severity = $request->severity;
                 $card->solution = $request->solution;
-                $card->impact_of_vulnerability = $request->impact_of_vulnerabilty;
+                $card->impact_of_vulnerability = $request->impact_of_vulnerability;
                 $card->scan_date_time = $request->scan_date_time; // Assuming you want the current date and time
                 $card->background = $request->background;
                 $card->service = $request->service;
@@ -291,18 +290,18 @@ class CardController extends Controller
                 $card->make = $request->make;
                 $card->host_name = $request->host_name;
                 $card->asset_type = $request->asset_type;
-                $card->PLK_VLAN10_POS_SICOM_Subnet = $request->plk_vlan10_pos_sicom_subnet;
-                $card->PLK_VLAN70_Kiosk_Subnet = $request->plk_vlan70_kiosk;
-                $card->PLK_VLAN254_Meraki_Management_Subnet = $request->plk_vlan254_meraki_management;
-                $card->PLK_VLAN4_Subnet = $request->plk_vlan4_subnet;
-                $card->BK_VLAN10_POS_SICOM_Subnet = $request->bk_vlan10_pos_sicom_subnet;
-                $card->BK_VLAN70_Kiosk_Subnet = $request->bk_vlan70_kiosk;
-                $card->BK_VLAN254_Meraki_Management_Subnet = $request->bk_vlan254_meraki_management;
-                $card->BK_VLAN4_Subnet = $request->bk_vlan4_subnet;
-                $card->THS_VLAN10_POS_SICOM_Subnet = $request->ths_vlan10_pos_sicom_subnet;
-                $card->THS_VLAN70_Kiosk_Subnet = $request->ths_vlan70_kiosk;
-                $card->THS_VLAN254_Meraki_Management_Subnet = $request->ths_vlan254_meraki_management;
-                $card->THS_VLAN4_Subnet = $request->ths_vlan4_subnet;
+                $card->PLK_VLAN10_POS_SICOM_Subnet = $request->PLK_VLAN10_POS_SICOM_Subnet;
+                $card->PLK_VLAN70_Kiosk_Subnet = $request->PLK_VLAN70_Kiosk_Subnet;
+                $card->PLK_VLAN254_Meraki_Management_Subnet = $request->PLK_VLAN254_Meraki_Management_Subnet;
+                $card->PLK_VLAN4_Subnet = $request->PLK_VLAN4_Subnet;
+                $card->BK_VLAN10_POS_SICOM_Subnet = $request->BK_VLAN10_POS_SICOM_Subnet;
+                $card->BK_VLAN70_Kiosk_Subnet = $request->BK_VLAN70_Kiosk_Subnet;
+                $card->BK_VLAN254_Meraki_Management_Subnet = $request->BK_VLAN254_Meraki_Management_Subnet;
+                $card->BK_VLAN4_Subnet = $request->BK_VLAN4_Subnet;
+                $card->THS_VLAN10_POS_SICOM_Subnet = $request->THS_VLAN10_POS_SICOM_Subnet;
+                $card->THS_VLAN70_Kiosk_Subnet = $request->THS_VLAN70_Kiosk_Subnet;
+                $card->THS_VLAN254_Meraki_Management_Subnet = $request->THS_VLAN254_Meraki_Management_Subnet;
+                $card->THS_VLAN4_Subnet = $request->THS_VLAN4_Subnet;
                 $card->start_date = $start_date; // Assuming you want the current date and time
                 $card->end_date = $end_date;   // Assuming you want the current date and time
                 $card->due_date = $due_date;   // Assuming you want the current date and time
@@ -320,7 +319,140 @@ class CardController extends Controller
                 activity('create')
                     ->performedOn($card) // Entry add in table. model name(subject_type) & id(subject_id)
                     ->causedBy(Auth::user()) //causer_id = admin id, causer type = admin model
-                    ->log(Auth::user()->name . ' created the Issue');
+                    ->log(Auth::user()->name . ' created the Task');
+           
+        }    
+        return back();
+    }
+
+    public function updateTask(Request $request)
+    {
+        $this->validate($request, [
+            'board_id' => 'required',
+            'card_id' => 'required',
+            'vulnerabilityName' => 'required',
+            'vulnerabilityID' => 'required',
+            'description' => 'required',
+            'vulnerabilityDetails' => 'required',
+            'ip_and_vuln_id' => 'required',
+            'port' => 'required',
+            'protocol' => 'required',
+            'os_type' => 'required',
+            'os_version' => 'required',
+            'business_unit' => 'required',
+            'class' => 'required',
+            'cve_id' => 'required',
+            'cvss_score' => 'required',
+            'severity' => 'required',
+            'solution' => 'required',
+            'impact_of_vulnerability' => 'required',
+            'scan_date_time' => 'required|date',
+            'background' => 'required',
+            'service' => 'required',
+            'remediation' => 'required',
+            'references' => 'required',
+            'exception' => 'required',
+            'tags' => 'required',
+            'asset_version' => 'required',
+            'model' => 'required',
+            'make' => 'required',
+            'asset_type' => 'required',
+            'host_name' => 'required',
+            'PLK_VLAN10_POS_SICOM_Subnet' => 'required',
+            'PLK_VLAN70_Kiosk_Subnet' => 'required',
+            'PLK_VLAN254_Meraki_Management_Subnet' => 'required',
+            'PLK_VLAN4_Subnet' => 'required',
+            'BK_VLAN10_POS_SICOM_Subnet' => 'required',
+            'BK_VLAN70_Kiosk_Subnet' => 'required',
+            'BK_VLAN254_Meraki_Management_Subnet' => 'required',
+            'BK_VLAN4_Subnet' => 'required',
+            'THS_VLAN10_POS_SICOM_Subnet' => 'required',
+            'THS_VLAN70_Kiosk_Subnet' => 'required',
+            'THS_VLAN254_Meraki_Management_Subnet' => 'required',
+            'THS_VLAN4_Subnet' => 'required',
+        ]);  
+
+
+        $start_date = $end_date = $due_date = null;
+        if (isset($request->start_date) && $request->start_date != null) {
+            $start_date = \Carbon\Carbon::createFromFormat('Y-m-d', $request->start_date)->toDateString();
+        }
+        if (isset($request->end_date) && $request->end_date != null) {
+            $end_date = \Carbon\Carbon::createFromFormat('Y-m-d', $request->end_date)->toDateString();
+        }
+        if (isset($request->due_date) && $request->due_date != null) {
+            $due_date = \Carbon\Carbon::createFromFormat('Y-m-d', $request->due_date)->toDateString();
+        }
+
+        $board = Board::find($request->board_id);
+        if($board)
+        {
+            $card = Card::find($request->card_id);
+            if($card)
+            {
+                $card->board_id = $board->id;
+                $card->vulnerability_id = $request->vulnerabilityID;
+                $card->content = $request->description;
+                $card->vulnerability_title = $request->vulnerabilityName;
+                $card->vulnerability_desc = $request->description;
+                $card->vulnerability_details = $request->vulnerabilityDetails;
+                $card->asset_ip = $request->asset_ip;
+                $card->ip_and_vuln_id = $request->ip_and_vuln_id;
+                $card->port = $request->port;
+                $card->protocol = $request->protocol;
+                $card->os_type = $request->os_type;
+                $card->os_version = $request->os_version;
+                $card->business_unit = $request->business_unit;
+                $card->class = $request->class;
+                $card->cve_id = $request->cve_id;
+                $card->cvss_score = $request->cvss_score;
+                $card->severity = $request->severity;
+                $card->solution = $request->solution;
+                $card->impact_of_vulnerability = $request->impact_of_vulnerability;
+                $card->scan_date_time = $request->scan_date_time; // Assuming you want the current date and time
+                $card->background = $request->background;
+                $card->service = $request->service;
+                $card->remediation = $request->remediation;
+                $card->references = $request->references;
+                $card->exception = $request->exception;
+                $card->tags = $request->tags;
+                $card->asset_version = $request->asset_version;
+                $card->model = $request->model;
+                $card->make = $request->make;
+                $card->host_name = $request->host_name;
+                $card->asset_type = $request->asset_type;
+                $card->PLK_VLAN10_POS_SICOM_Subnet = $request->PLK_VLAN10_POS_SICOM_Subnet;
+                $card->PLK_VLAN70_Kiosk_Subnet = $request->PLK_VLAN70_Kiosk_Subnet;
+                $card->PLK_VLAN254_Meraki_Management_Subnet = $request->PLK_VLAN254_Meraki_Management_Subnet;
+                $card->PLK_VLAN4_Subnet = $request->PLK_VLAN4_Subnet;
+                $card->BK_VLAN10_POS_SICOM_Subnet = $request->BK_VLAN10_POS_SICOM_Subnet;
+                $card->BK_VLAN70_Kiosk_Subnet = $request->BK_VLAN70_Kiosk_Subnet;
+                $card->BK_VLAN254_Meraki_Management_Subnet = $request->BK_VLAN254_Meraki_Management_Subnet;
+                $card->BK_VLAN4_Subnet = $request->BK_VLAN4_Subnet;
+                $card->THS_VLAN10_POS_SICOM_Subnet = $request->THS_VLAN10_POS_SICOM_Subnet;
+                $card->THS_VLAN70_Kiosk_Subnet = $request->THS_VLAN70_Kiosk_Subnet;
+                $card->THS_VLAN254_Meraki_Management_Subnet = $request->THS_VLAN254_Meraki_Management_Subnet;
+                $card->THS_VLAN4_Subnet = $request->THS_VLAN4_Subnet;
+                $card->start_date = $start_date; // Assuming you want the current date and time
+                $card->end_date = $end_date;   // Assuming you want the current date and time
+                $card->due_date = $due_date;   // Assuming you want the current date and time
+                $card->created_by = Auth::id();
+                $card->save();
+            }
+                
+               
+            if(isset($request->assignee) && $request->assignee != '')
+            {
+                $user = User::find($request->assignee);
+                if($user)
+                {
+                    $card->users()->sync([$user->id]);
+                }
+            }
+                activity('update')
+                    ->performedOn($card) // Entry add in table. model name(subject_type) & id(subject_id)
+                    ->causedBy(Auth::user()) //causer_id = admin id, causer type = admin model
+                    ->log(Auth::user()->name . ' updated the Task');
            
         }    
         return back();
