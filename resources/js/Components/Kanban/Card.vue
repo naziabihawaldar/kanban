@@ -438,10 +438,7 @@ const showForm = async (cardContent) => {
     editTask_filter_items.value = cardContent.users;
   }
   await nextTick();
-  openEditModal()
-  // useEditCard.value.currentCard = props?.card?.id;
-  // await nextTick(); // wait for form to be rendered
-  // inputCardContentRef.value.focus();
+  openEditModal();
 
 };
 
