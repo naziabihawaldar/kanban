@@ -26,5 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-projects', [ApiController::class, 'getProjects']);
     Route::get('/get-tasks', [ApiController::class, 'getTasks']);   
     Route::post('/store-task', [ApiController::class, 'storeTask']);   
-    Route::post('/update-task', [ApiController::class, 'updateTask']);   
+    Route::post('/update-task', [ApiController::class, 'updateTask']);
+    Route::post('/store-project', [ApiController::class, 'storeProject']);
+    Route::post('/update-column', [ApiController::class, 'updateColumn']);
 });

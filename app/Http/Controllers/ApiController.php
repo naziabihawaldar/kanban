@@ -376,13 +376,51 @@ class ApiController extends Controller
             return ['status' => 'error', 'message' => 'Project Not Found'];
             
         } catch (\Exception $e) {
-            // logger($e);
+            logger($e);
             return ['status' => 'error', 'message' => 'Error Occurred'];
         }
+    }
 
-
-
-
+    public function storeProject(Request $request)
+    {
+        try 
+        {            
+            if(isset($request->title) && $request->title != '')
+            {
+                $board = new Board;
+                $board->title = $request->title;
+                $board->user_id = Auth::id();
+                $board->save();
+                return ['status' => 'success', 'message' => 'success','data' => $board];
+            }
+            return ['status' => 'error', 'message' => 'Title Not Found'];
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status' => 'error', 'message' => 'Error Occurred'];
+        }
+    }
+    public function updateColumn(Request $request)
+    {
+        try 
+        {
+            $column = Column::find($request->column_id);
+            if($column)
+            {
+                $card = Card::find($request->task_id);
+                if($card)
+                {
+                    $card->column_id = $column->id;
+                    $card->save();
+                    return ['status' => 'success','message'=>'success'];
+                }
+                return ['status'=> 'error','message'=>'Task not found'];
+            }
+            return ['status'=> 'error','message'=>'Column not found'];
+            
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status'=> 'error'];
+        }   
     }
 
 }
