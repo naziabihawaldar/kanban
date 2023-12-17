@@ -299,15 +299,12 @@ class ApiController extends Controller
             }
 
             $board = Board::find($request->board_id);
-            if ($board) 
-            {
+            if ($board) {
                 $card = Card::find($request->card_id);
-                if(!$card)
-                {
+                if (!$card) {
                     return ['status' => 'error', 'message' => 'Task Not Found'];
                 }
-                if ($card) 
-                {
+                if ($card) {
                     $card->board_id = $board->id;
                     $card->vulnerability_id = $request->vulnerabilityID;
                     $card->content = $request->description;
@@ -369,12 +366,12 @@ class ApiController extends Controller
                     ->performedOn($card) // Entry add in table. model name(subject_type) & id(subject_id)
                     ->causedBy(Auth::user()) //causer_id = admin id, causer type = admin model
                     ->log(Auth::user()->name . ' updated the Task');
-                
+
                 return ['status' => 'success', 'message' => 'Task updated successfully'];
 
             }
             return ['status' => 'error', 'message' => 'Project Not Found'];
-            
+
         } catch (\Exception $e) {
             logger($e);
             return ['status' => 'error', 'message' => 'Error Occurred'];
@@ -383,15 +380,35 @@ class ApiController extends Controller
 
     public function storeProject(Request $request)
     {
-        try 
-        {            
-            if(isset($request->title) && $request->title != '')
-            {
+        try {
+            if (isset($request->title) && $request->title != '') {
                 $board = new Board;
                 $board->title = $request->title;
                 $board->user_id = Auth::id();
                 $board->save();
-                return ['status' => 'success', 'message' => 'success','data' => $board];
+
+                $todoColumn = new Column;
+                $todoColumn->title = 'To Do';
+                $todoColumn->board_id = $board->id;
+                $todoColumn->save();
+                $todoColumn = new Column;
+                $todoColumn->title = 'Under Investigation';
+                $todoColumn->board_id = $board->id;
+                $todoColumn->save();
+                $todoColumn = new Column;
+                $todoColumn->title = 'Delayed';
+                $todoColumn->board_id = $board->id;
+                $todoColumn->save();
+                $todoColumn = new Column;
+                $todoColumn->title = 'Completed';
+                $todoColumn->board_id = $board->id;
+                $todoColumn->save();
+
+                activity('create')
+                    ->performedOn($board) // Entry add in table. model name(subject_type) & id(subject_id)
+                    ->causedBy(Auth::user()) //causer_id = admin id, causer type = admin model
+                    ->log('A New Board is Created By ' . Auth::user()->name);
+                return ['status' => 'success', 'message' => 'success', 'data' => $board];
             }
             return ['status' => 'error', 'message' => 'Title Not Found'];
         } catch (\Exception $e) {
@@ -401,26 +418,23 @@ class ApiController extends Controller
     }
     public function updateColumn(Request $request)
     {
-        try 
-        {
+        try {
             $column = Column::find($request->column_id);
-            if($column)
-            {
+            if ($column) {
                 $card = Card::find($request->task_id);
-                if($card)
-                {
+                if ($card) {
                     $card->column_id = $column->id;
                     $card->save();
-                    return ['status' => 'success','message'=>'success'];
+                    return ['status' => 'success', 'message' => 'success'];
                 }
-                return ['status'=> 'error','message'=>'Task not found'];
+                return ['status' => 'error', 'message' => 'Task not found'];
             }
-            return ['status'=> 'error','message'=>'Column not found'];
-            
+            return ['status' => 'error', 'message' => 'Column not found'];
+
         } catch (\Exception $e) {
             logger($e);
-            return ['status'=> 'error'];
-        }   
+            return ['status' => 'error'];
+        }
     }
 
 }
