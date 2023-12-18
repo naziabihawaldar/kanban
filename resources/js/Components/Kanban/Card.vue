@@ -439,7 +439,6 @@ const showForm = async (cardContent) => {
   }
   await nextTick();
   openEditModal();
-
 };
 
 </script>
@@ -801,7 +800,7 @@ const showForm = async (cardContent) => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" size="small" @click="closeDetailModal">Save & Close</v-btn>
+        <v-btn variant="elevated" color="primary" size="small" @click="closeDetailModal">Save & Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

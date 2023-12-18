@@ -620,8 +620,6 @@ const resetUserFilters = () => {
         <div class="inline-flex h-full items-start space-x-4 overflow-hidden">
 
           <Column :boardId=boardID :boardtitle="boardTitle" :filters="filter_data" :key="key_column" />
-          <!-- <Column v-for="column in columns" :key="temp_var" :column="column" @reorder-change="onReorderChange"
-            @reorder-commit="onReorderCommit" /> -->
           <div class="w-72">
             <ColumnCreate :board="board.data" @onColoumnCreated="columnReload" @reorder-change="onReorderChange"
               @reorder-commit="onReorderCommit" />
