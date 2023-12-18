@@ -1,6 +1,6 @@
 <script setup>
 import Datepicker from 'vue3-datepicker';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, reactive } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, router, useForm, Link } from '@inertiajs/vue3';
 import Column from '@/Components/Kanban/Column.vue';
@@ -90,6 +90,7 @@ const filterForm = useForm({
   os_version: '',
   business_unit: '',
   searchtxt: '',
+  assigneeUsers: '',
 });
 const addTaskForm = useForm({
   board_id: '',
@@ -457,6 +458,7 @@ const addAssigneeDialog = ref(false);
 const assignee_select = ref(boardAssignees.value);
 const assignee_keyword = ref('');
 const assignee_items = ref([]);
+
 const assignee_loading = ref(false);
 const closeAssigneeModal = () => {
   addAssigneeDialog.value = false;
@@ -523,18 +525,26 @@ var clearBoardSearch = function () {
   callFilterAPI(filterForm);
   key_column.value = key_column.value ? false : true;
 };
-
-var userFilter = function (user_name, user_id) {
-  Object.assign(obj, { Assignee: user_name });
-  if (Object.keys(obj).length != 0) {
-    chipModal.value = true;
-    filterForm.assignee = user_id;
-    callFilterAPI(filterForm);
-  } else {
-    key_column.value = key_column.value ? false : true;
-    columns.value = [];
-    columns.value = props.board?.data?.columns;
+// const assignee_filter_items = reactive({
+//   // user_data: [],
+//   // card_id: ''
+// });
+let usr_obj = [];
+const assignee_filter_items = ref([]);
+const activeIndex = ref(null);
+var userFilter = function (user_name, user_id ,index) {
+  activeIndex.value =  true;
+  if(!assignee_filter_items.value.includes(user_id))
+  {
+    assignee_filter_items.value.push(user_id);
+  }else{
+    const index = assignee_filter_items.value.findIndex(value => value ===  user_id);
+    if (index !== -1) {
+      assignee_filter_items.value.splice(index, 1);
+    }
   }
+  filterForm.assigneeUsers = assignee_filter_items.value;
+  callFilterAPI(filterForm);
 };
 const addTaskDialog = ref(false);
 const closeAddTaskModal = () => {
@@ -542,6 +552,11 @@ const closeAddTaskModal = () => {
 };
 const openAddTaskModal = () => {
   addTaskDialog.value = true;
+};
+const resetUserFilters = () => {
+  assignee_filter_items.value = [];
+  filterForm.assigneeUsers = null;
+  key_column.value = key_column.value ? false : true;
 };
 
 </script>
@@ -565,20 +580,21 @@ const openAddTaskModal = () => {
         </v-col>
         <v-col cols="4" align="left" class="text-left">
           <div class="ml-6 text-lg-left left-1">
-            <div style="width: 40px;height: 40px;padding:9px;border-radius: 50%;background:red;color:#fff;font-size: 17px;">
-              {{ getNameInitials("TEST TEST") }}
-            </div>
-
-            <!-- <template v-for="boardAssignee in boardAssignees" :key="boardAssignee.id">
-              <v-avatar @click="userFilter(boardAssignee.name, boardAssignee.id)"
-                :color="colors[Math.floor(Math.random() * colors.length)]" class="mr-1"
-                style="width: 40px;height: 40px;font-size: 14px;margin-left: -10px;cursor: pointer;">
-                <v-tooltip activator="parent" location="bottom">{{ boardAssignee.name }}</v-tooltip>
-                {{ getNameInitials(boardAssignee.name) }}
-              </v-avatar>
-            </template> -->
+            <template v-for="(boardAssignee, index) in boardAssignees" :key="boardAssignee.id">
+              <div @click="userFilter(boardAssignee.name, boardAssignee.id ,index )" :class="{ blueBorder:assignee_filter_items.includes(boardAssignee.id) }"  style="border-radius: 50%;display: inline-flex;-webkit-box-align: center;align-items: center;height: 40px;position: relative;margin-left: -10px;vertical-align: top;padding: 0px;transition: transform 0.1s ease-out 0s;border-radius: 50%;z-index: 3;cursor:pointer;">
+                <div style="display: inline-block;position: relative;outline: 0px;">
+                <div :style="{background:colors[Math.floor(Math.random() * colors.length)]}" class="mainAssigneeCss">
+                  <div style="border-radius:50%;padding:4px 6px;" >
+                    <v-tooltip activator="parent" location="bottom">{{ boardAssignee.name }}</v-tooltip>
+                    {{ getNameInitials(boardAssignee.name) }}
+                  </div>
+                </div>
+                </div>
+              </div>
+            </template>
             <v-btn class="ma-2" style="width: 32px;height: 32px;font-size: 14px;" color="indigo"
               icon="mdi mdi-account-plus-outline" @click="openAssigneeModal"></v-btn>
+              <v-btn @click="resetUserFilters" v-if="assignee_filter_items.length > 0" variant="text" size="small" >Clear filters</v-btn>
           </div>
         </v-col>
         <v-col cols="6" align="right" class="text-right">
@@ -1149,48 +1165,60 @@ const openAddTaskModal = () => {
                       <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
                     </template>
                   </Datepicker>
-              </div>
-            </v-col>
-            <v-col cols="6" class="pt-0">
-              <div>
-                <InputLabel value="End Date" />
-                <Datepicker variant="outlined" required density="compact" class="mt-2 w-100"
-                  style="border: 1px solid #6b7280;border-radius:5px;" v-model="addTask_end_date">
-                  <template v-slot:clear="{ onClear }">
-                    <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
-                  </template>
-                </Datepicker>
-              </div>
-            </v-col>
-            <v-col cols="6">
-              <div>
-                <InputLabel value="Due Date" />
-                <Datepicker variant="outlined" class="mt-2 w-100" required density="compact"
-                  style="border: 1px solid #6b7280;border-radius:5px;" v-model="addTask_due_date">
-                  <template v-slot:clear="{ onClear }">
-                    <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
-                  </template>
-                </Datepicker>
-              </div>
-            </v-col>
-          </v-row>
+                </div>
+              </v-col>
+              <v-col cols="6" class="pt-0">
+                <div>
+                  <InputLabel value="End Date" />
+                  <Datepicker variant="outlined" required density="compact" class="mt-2 w-100"
+                    style="border: 1px solid #6b7280;border-radius:5px;" v-model="addTask_end_date">
+                    <template v-slot:clear="{ onClear }">
+                      <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                    </template>
+                  </Datepicker>
+                </div>
+              </v-col>
+              <v-col cols="6">
+                <div>
+                  <InputLabel value="Due Date" />
+                  <Datepicker variant="outlined" class="mt-2 w-100" required density="compact"
+                    style="border: 1px solid #6b7280;border-radius:5px;" v-model="addTask_due_date">
+                    <template v-slot:clear="{ onClear }">
+                      <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
+                    </template>
+                  </Datepicker>
+                </div>
+              </v-col>
+            </v-row>
 
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn size="small" variant="outlined" color="red-darken-4" text="Close" :loading="addTaskLoading"
-            :disabled="addTaskLoading" @click="closeAddTaskModal"></v-btn>
-          <v-btn size="small" variant="outlined" color="green-darken-3" :loading="addTaskLoading"
-            :disabled="addTaskLoading" text="Submit" type="submit"></v-btn>
-        </v-card-actions>
-      </v-card>
-    </form>
-  </v-dialog>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn size="small" variant="outlined" color="red-darken-4" text="Close" :loading="addTaskLoading"
+              :disabled="addTaskLoading" @click="closeAddTaskModal"></v-btn>
+            <v-btn size="small" variant="outlined" color="green-darken-3" :loading="addTaskLoading"
+              :disabled="addTaskLoading" text="Submit" type="submit"></v-btn>
+          </v-card-actions>
+        </v-card>
+      </form>
+    </v-dialog>
 
-  <template v-if="snackbar_show">
-    <v-snackbar v-model="snackbar_show" :timeout="1000">
-      {{ snackbar_msg }}
-    </v-snackbar>
-  </template>
+    <template v-if="snackbar_show">
+      <v-snackbar v-model="snackbar_show" :timeout="1000">
+        {{ snackbar_msg }}
+      </v-snackbar>
+    </template>
 
-</AuthenticatedLayout></template>
+  </AuthenticatedLayout>
+</template>
+<style scoped>
+  .mainAssigneeCss{
+    height: 32px;width: 32px;-webkit-box-align: stretch;align-items: stretch;background-color: var(--ds-surface-overlay, #FFFFFF);border-radius: 50%;box-sizing: content-box;cursor: inherit;display: flex;flex-direction: column;-webkit-box-pack: center;justify-content: center;outline: none;overflow: hidden;position: static;transform: translateZ(0px);transition: transform 200ms ease 0s, opacity 200ms ease 0s;box-shadow: 0 0 0 2px var(--ds-surface-overlay, #FFFFFF);border: none;margin: var(--ds-space-025, 2px);padding: var(--ds-space-0, 0px);font-size: inherit;font-family: inherit;
+  }
+  .blueBorder{
+    border-width: 2px;
+    border-style: solid;
+    border-image: initial;
+    border-color: var(--ds-icon-brand,#0052CC);
+  }
+  </style>

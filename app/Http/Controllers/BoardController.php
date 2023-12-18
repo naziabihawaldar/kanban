@@ -62,7 +62,6 @@ class BoardController extends Controller
 
     public function getDetailsByFilter(Request $request) 
     {
-        // logger($request);   
         $columns = Column::where('board_id', $request->board_id)->get();
         foreach ($columns as $column)
         {
@@ -81,6 +80,12 @@ class BoardController extends Controller
             {
                 $cards = $cards->whereHas('users', function ($q) use ($request, $column) {
                     $q->where('users.id',  $request->assignee );  
+                });
+            }
+            if($request->has('assigneeUsers') && $request->assigneeUsers != '')
+            {
+                $cards = $cards->whereHas('users', function ($q) use ($request, $column) {
+                    $q->whereIn('users.id',  $request->assigneeUsers );  
                 });
             }
             if($request->has('imports') && $request->imports != '')

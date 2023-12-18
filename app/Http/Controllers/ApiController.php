@@ -380,8 +380,10 @@ class ApiController extends Controller
 
     public function storeProject(Request $request)
     {
-        try {
-            if (isset($request->title) && $request->title != '') {
+        try 
+        {
+            if (isset($request->title) && $request->title != '') 
+            {
                 $board = new Board;
                 $board->title = $request->title;
                 $board->user_id = Auth::id();
@@ -418,7 +420,8 @@ class ApiController extends Controller
     }
     public function updateColumn(Request $request)
     {
-        try {
+        try 
+        {
             $column = Column::find($request->column_id);
             if ($column) {
                 $card = Card::find($request->task_id);
