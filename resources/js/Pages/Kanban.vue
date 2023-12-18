@@ -543,16 +543,26 @@ var userFilter = function (user_name, user_id ,index) {
       assignee_filter_items.value.splice(index, 1);
     }
   }
-  filterForm.assigneeUsers = assignee_filter_items.value;
-  callFilterAPI(filterForm);
+  if(assignee_filter_items.value.length > 0)
+  {
+    filterForm.assigneeUsers = assignee_filter_items.value;
+    callFilterAPI(filterForm);
+  }else{
+    resetUserFilters();
+  }
+
+  
 };
 const addTaskDialog = ref(false);
+
 const closeAddTaskModal = () => {
   addTaskDialog.value = false;
 };
+
 const openAddTaskModal = () => {
   addTaskDialog.value = true;
 };
+
 const resetUserFilters = () => {
   assignee_filter_items.value = [];
   filterForm.assigneeUsers = null;
