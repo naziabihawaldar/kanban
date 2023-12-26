@@ -52,6 +52,7 @@ const headers = [
     { "title": "THS_VLAN254 (Meraki-Management)", "key": "thsVLAN254", "align": "left", sortable: false },
     { "title": "THS_VLAN4 Subnet", "key": "thsVLAN4Subnet", "align": "left", sortable: false }
 ];
+const projectList = ref('');
 const loadItems = (data) => {
     serverItems.value = [];
     if(typeof data == 'undefined' )
@@ -69,6 +70,13 @@ const loadItems = (data) => {
         }
     }).catch((error) => {
     })
+    axios.get('/get-project-list').then((res) => {
+        if (res.data.status == 'success') {
+           projectList.value = res.data.data;
+        }
+    }).catch((error) => {
+    })
+
 };
 
 const itemsPerPage = ref(15);
@@ -125,6 +133,7 @@ const chipModal = ref(false);
 
 var obj = {};
 const filterForm = useForm({
+    project: '',
     assignee: '',
     severity: '',
     domain: '',
@@ -177,7 +186,6 @@ const filter_query = async (query) => {
             filter_loading.value = false;
         }
     }
-
 };
 watch(filter_keyword, (v) => {
     filter_query(v);
@@ -438,8 +446,15 @@ function resetFilter(val) {
                         <v-row>
                             <v-col cols="6">
                                 <div>
+                                    <InputLabel for="name" value="Project" />
+                                    <v-select variant="outlined" density="compact"  v-model="filterForm.project"
+                                        :items="projectList" item-title="title" item-value="id"></v-select>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
                                     <InputLabel for="name" value="Assignee Name" />
-                                    <v-combobox outlined clearable chips color="green " v-model:search="filter_keyword"
+                                    <v-combobox variant="outlined" density="compact" clearable chips color="green " v-model:search="filter_keyword"
                                         no-filter v-model="filter_select" :items="filter_items" :loading="filter_loading"
                                         item-title="name" item-value="id" @focus="() => filter_query(keyword)" />
                                 </div>
@@ -447,21 +462,21 @@ function resetFilter(val) {
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="name" value="Severity" />
-                                    <v-select outlined label="Select" v-model="filterForm.severity"
+                                    <v-select variant="outlined" density="compact"  v-model="filterForm.severity"
                                         :items="['Critical', 'High', 'Medium', 'Low', 'Informational', 'None']"></v-select>
                                 </div>
                             </v-col>
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="Domain" />
-                                    <v-select outlined v-model="filterForm.domain"
+                                    <v-select variant="outlined" density="compact" v-model="filterForm.domain"
                                         :items="['System Services', 'Infrastructure']"></v-select>
                                 </div>
                             </v-col>
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="Start Date" />
-                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                    <Datepicker variant="outlined" density="compact" style="border: 1px solid lightgrey;width:90%" :clearable="true"
                                         v-model="filter_start_date">
                                         <template v-slot:clear="{ onClear }">
                                             <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
@@ -472,7 +487,7 @@ function resetFilter(val) {
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="End Date" />
-                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                    <Datepicker variant="outlined" density="compact" style="border: 1px solid lightgrey;width:90%" :clearable="true"
                                         v-model="filter_end_date">
                                         <template v-slot:clear="{ onClear }">
                                             <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
@@ -483,7 +498,7 @@ function resetFilter(val) {
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="Due Date" />
-                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                    <Datepicker variant="outlined" density="compact" style="border: 1px solid lightgrey;width:90%" :clearable="true"
                                         v-model="filter_due_date">
                                         <template v-slot:clear="{ onClear }">
                                             <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
@@ -495,7 +510,7 @@ function resetFilter(val) {
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="Scan Date" />
-                                    <Datepicker style="border: 1px solid lightgrey;width:90%" :clearable="true"
+                                    <Datepicker variant="outlined" density="compact" style="border: 1px solid lightgrey;width:90%" :clearable="true"
                                         v-model="filter_scan_date">
                                         <template v-slot:clear="{ onClear }">
                                             <v-chip @click="onClear" style="color: red;left:-35px !important">x</v-chip>
@@ -506,7 +521,7 @@ function resetFilter(val) {
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="Vulnerability Name" />
-                                    <v-text-field outlined v-model="filterForm.vulnerabilityName" label="Vulnerability Name"
+                                    <v-text-field variant="outlined" density="compact" v-model="filterForm.vulnerabilityName"
                                         hide-details></v-text-field>
                                 </div>
                             </v-col>
@@ -514,24 +529,24 @@ function resetFilter(val) {
                             <v-col cols="6">
                                 <div>
                                     <InputLabel for="domain" value="IP & Vulnerability ID:" />
-                                    <v-text-field outlined v-model="filterForm.ip_and_vuln_id" label="IP & Vulnerability ID"
+                                    <v-text-field variant="outlined" density="compact" v-model="filterForm.ip_and_vuln_id" 
                                         hide-details></v-text-field>
                                 </div>
                             </v-col>
                             <v-col cols="6">
                                 <InputLabel value="OS Type" />
-                                <v-text-field outlined v-model="filterForm.os_type" label="OS Type"
+                                <v-text-field variant="outlined" density="compact" v-model="filterForm.os_type" 
                                     hide-details></v-text-field>
                             </v-col>
 
                             <v-col cols="6">
                                 <InputLabel for="domain" value="OS Version:" />
-                                <v-text-field outlined v-model="filterForm.os_version" label="OS Version"
+                                <v-text-field variant="outlined" density="compact" v-model="filterForm.os_version" 
                                     hide-details></v-text-field>
                             </v-col>
                             <v-col cols="6">
                                 <InputLabel value="Business Unit" />
-                                <v-text-field outlined v-model="filterForm.business_unit" label="Business Unit"
+                                <v-text-field variant="outlined" density="compact" v-model="filterForm.business_unit" 
                                     hide-details></v-text-field>
                             </v-col>
                         </v-row>
@@ -539,7 +554,7 @@ function resetFilter(val) {
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn size="small" text="Close" @click="closeModal"></v-btn>
-                        <v-btn size="small" text="Submit" type="submit"></v-btn>
+                        <v-btn size="small" color="primary" text="Submit" type="submit"></v-btn>
                     </v-card-actions>
                 </v-card>
             </form>

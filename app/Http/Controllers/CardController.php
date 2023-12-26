@@ -138,7 +138,6 @@ class CardController extends Controller
                 if($board) 
                 {
                     $board_assignees = $board->assignees()->get()->pluck('id')->toArray();
-                    logger($board_assignees);
                     if(!in_array($user->id, $board_assignees))
                     {
                         $board->assignees()->attach($user);

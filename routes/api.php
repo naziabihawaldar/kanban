@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-projects', [ApiController::class, 'getProjects']);
+    
     Route::get('/get-tasks', [ApiController::class, 'getTasks']);   
     Route::post('/store-task', [ApiController::class, 'storeTask']);   
     Route::post('/update-task', [ApiController::class, 'updateTask']);

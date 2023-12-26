@@ -32,34 +32,16 @@ class BoardController extends Controller
             'board' => $board ? BoardResource::make($board) : null,
         ]);
     }
-
-    // public function show(Request $request, Board $board)
-    // {
-    //     // logger($board);
-        
-    //     // if(isset($request->assignee) && !empty($request->assignee) && $request->assignee !="None") 
-    //     // {
-    //     //     $assignee = Board::where('id',$board->id)->whereHas('columns.cards.users' , function($query) use ($request) {
-    //     //         return $query->where('users.id', $request->assignee);
-    //     //     })->first();
-    //     //     logger($assignee);
-    //     // }
-    //     $board?->loadMissing(['columns.cards.users','assignees']);
-    //     // logger($board);
-    //      // Case when no board is passed over
-    //     // if (!$board->exists) {
-           
-    //     //     $board = $request->user()->boards()->first();
-    //     // }
-
-    //     // eager load columns with their cards
-        
-        
-    //     return inertia('Kanban', [
-    //         'board' => $board ? BoardResource::make($board) : null,
-    //     ]);
-    // }
-
+    public function getProjectsList(Request $request)
+    {
+        try {
+            $boards = Board::select('id','title')->orderBy('created_at', 'desc')->get();
+            return ['status' => 'success', 'message' => 'success', 'data' => $boards];
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status' => 'error', 'message' => 'Error Occurred'];
+        }
+    }
     public function getDetailsByFilter(Request $request) 
     {
         $columns = Column::where('board_id', $request->board_id)->get();

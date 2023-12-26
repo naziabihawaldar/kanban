@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/store-task', [CardController::class, 'storeTask']);
     Route::post('/update-task', [CardController::class, 'updateTask']);
     Route::get('/get-import-details', [BoardController::class, 'getFileDetails']);
+    Route::get('/get-project-list', [BoardController::class, 'getProjectsList']);
 
 });
 

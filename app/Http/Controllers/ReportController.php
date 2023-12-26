@@ -30,6 +30,9 @@ class ReportController extends Controller
                 }
                 $reports = $reports->orderBy($sort_data['key'], $sort_order);
             }
+            if (isset($filters['project']) && $filters['project'] != '') {
+                $reports = $reports->where('board_id', $filters['project']);
+            }
             if (isset($filters['severity']) && $filters['severity'] != '') {
                 $reports = $reports->where('severity', $filters['severity']);
             }
