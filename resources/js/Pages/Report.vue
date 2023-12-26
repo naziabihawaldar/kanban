@@ -9,7 +9,7 @@ const headers = [
     { "title": "Vulnerability Name", "key": "vulnerabilityName", "align": "left", sortable: false },
     { "title": "Vulnerability ID", "key": "vulnerabilityID", "align": "left", sortable: false },
     { "title": "Vulnerability Description", "key": "vulnerabilityDescription", "align": "left", sortable: false },
-    { "title": "Board", "key": "board", "align": "left", sortable: false },
+    { "title": "Project", "key": "project", "align": "left", sortable: false },
     { "title": "Assigned To", "key": "assignedTo", "align": "left", sortable: false },
     { "title": "Start Date", "key": "start_date", "align": "left", sortable: false },
     { "title": "End Date", "key": "end_date", "align": "left", sortable: false },
@@ -54,7 +54,6 @@ const headers = [
 ];
 const loadItems = (data) => {
     serverItems.value = [];
-    console.log(JSON.stringify(data));
     if(typeof data == 'undefined' )
     {
         var data = {};

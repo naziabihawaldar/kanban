@@ -129,12 +129,14 @@ class CardController extends Controller
     public function assignCardToUser(Request $request)
     {
         $card = Card::find($request->card_id);
-        if ($card) {
+        if ($card) 
+        {
             $user = User::find($request->user_id);
             if ($user) {
                 $card->users()->sync([$request->user_id]);
                 $board = Board::find($card->board_id);
-                if ($board) {
+                if($board) 
+                {
                     $board->assignees()->attach($user);
                 }
                 $mailData = [

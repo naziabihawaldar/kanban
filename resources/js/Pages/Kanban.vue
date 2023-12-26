@@ -525,10 +525,7 @@ var clearBoardSearch = function () {
   callFilterAPI(filterForm);
   key_column.value = key_column.value ? false : true;
 };
-// const assignee_filter_items = reactive({
-//   // user_data: [],
-//   // card_id: ''
-// });
+
 let usr_obj = [];
 const assignee_filter_items = ref([]);
 const activeIndex = ref(null);
@@ -550,8 +547,6 @@ var userFilter = function (user_name, user_id ,index) {
   }else{
     resetUserFilters();
   }
-
-  
 };
 const addTaskDialog = ref(false);
 
