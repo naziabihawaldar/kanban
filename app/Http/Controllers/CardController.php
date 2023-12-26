@@ -137,7 +137,12 @@ class CardController extends Controller
                 $board = Board::find($card->board_id);
                 if($board) 
                 {
-                    $board->assignees()->attach($user);
+                    $board_assignees = $board->assignees()->get()->pluck('id')->toArray();
+                    logger($board_assignees);
+                    if(!in_array($user->id, $board_assignees))
+                    {
+                        $board->assignees()->attach($user);
+                    }
                 }
                 $mailData = [
                     'username' => $user->name,

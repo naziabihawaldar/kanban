@@ -740,7 +740,7 @@ const showForm = async (cardContent) => {
                       <b class="accent--text" style="font-size:14px">Assignee</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-                      <v-combobox variant="outlined" clearable chips color="green " v-model:search="keyword" no-filter
+                      <v-combobox variant="outlined" density="compact" clearable chips color="green " v-model:search="keyword" no-filter
                         v-model="select" :items="items" :loading="loading" item-title="name" item-value="id" return-object
                         @focus="() => query(keyword)" />
                     </v-col>
@@ -748,7 +748,7 @@ const showForm = async (cardContent) => {
                       <b class="accent--text" style="font-size:14px">Start Date</b>
                     </v-col>
                     <v-col cols="9" class="pl-0 pt-3 pb-3">
-                      <Datepicker style="border: 1px solid lightgrey;" :clearable="true" v-model="start_date">
+                      <Datepicker  style="border: 1px solid lightgrey;" :clearable="true" v-model="start_date">
                         <template v-slot:clear="{ onClear }">
                           <v-chip @click="onClear" style="color: red;left:-35px !important;">x</v-chip>
                         </template>

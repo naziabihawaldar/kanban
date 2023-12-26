@@ -31,4 +31,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-column', [ApiController::class, 'updateColumn']);
     Route::get('/get-project-assignees', [ApiController::class, 'getProjectAssignees']);
     Route::get('/get-reports', [ApiController::class, 'getReports']);
+    Route::post('/download-reports', [ApiController::class, 'downloadReports']);
 });

@@ -516,4 +516,19 @@ class ApiController extends Controller
 
     }
 
+    public function downloadReports(Request $request)
+    {
+        try 
+        {
+            $board = Board::find($request->project_id);
+            if($board)
+            {
+                return ['status' => 'success', 'message' => 'success', 'download_link' => '/reports1703572600649.csv'];
+            }
+            return ['status' => 'error', 'message' => 'Project Not Found'];
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status' => 'error', 'message' => 'Error Occurred'];
+        }
+    }
 }
