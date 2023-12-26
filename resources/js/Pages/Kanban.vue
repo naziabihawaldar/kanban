@@ -19,6 +19,7 @@ const boardTitle = computed(() => props.board?.data?.title);
 const importsData = computed(() => props.board?.data?.imports);
 const boardID = computed(() => props.board?.data?.id);
 const boardAssignees = computed(() => props.board?.data?.board_assignees);
+
 const columnsWithOrder = ref([]);
 const onReorderChange = column => {
   console.log("called inside kanban for onReorderChange");
@@ -464,6 +465,7 @@ const closeAssigneeModal = () => {
   addAssigneeDialog.value = false;
 };
 const openAssigneeModal = () => {
+  assignee_select.value = boardAssignees.value;
   addAssigneeDialog.value = true;
 };
 const assignee_query = async (query) => {

@@ -35,14 +35,8 @@ const closeModal = (val, colID) => {
         board_id.value = props.boardId;
     }
 };
-// watch(filters, (data) => {
-
-// });
 watch(board_id, (value) => {
-    // var postData = {
-    //     filters : filtersData.value,
-    //     board_id : board_id.value,
-    // };
+   
     var postData = {};
     if(filtersData.value.length == 0)
     {
@@ -51,28 +45,17 @@ watch(board_id, (value) => {
         };
     }else{
         var postData = filtersData.value;
-        // postData.board_id = board_id.value;
     }
-    // filtersData.board_id = board_id.value;
    
     axios.post('/get-cards-based-on-filters', postData).then((res) => {
         if (res.data.status == 'success') {
             columns.value = [];
             columns.value = res.data.data;
-            // comp_columns.value = res.data.data;
-            //closeFilterModal();
             nextTick();
         }
     }).catch((error) => {
         // console.log(error);
     });
-    // axios.get('/get-columns', { params: { board_id: value } }).then((res) => {
-    //     if (res.data.status == 'success') {
-    //         columns.value = res.data.data;
-    //     }
-    // }).catch((error) => {
-    //     // console.log(error);
-    // })
 }, {
     immediate: true,
     deep: true,
