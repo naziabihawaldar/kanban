@@ -339,8 +339,8 @@ function resetFilter(val) {
                         icon="mdi mdi-filter-variant" color="black-lighten-4"></v-btn>
                 </v-col>
                 <v-col cols="12">
-                    <v-data-table-server ref="vuetable" class="dense" v-model:items-per-page="itemsPerPage" :headers="headers"
-                        :items-length="totalItems" :items="serverItems" :loading="loading" :search="search"
+                    <v-data-table-server ref="vuetable" density="compact" variant="outlined" class="dense" v-model:items-per-page="itemsPerPage" :headers="headers"
+                        :items-length="totalItems" :items="serverItems" :items-per-page-options="[10, 25, 50, 100]" :loading="loading" :search="search"
                         item-value="name" @update:options="loadItems" @request="loadItems">
                         <template v-slot:item="item">
                             <tr>
