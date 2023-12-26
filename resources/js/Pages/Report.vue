@@ -191,7 +191,6 @@ watch(filter_keyword, (v) => {
     filter_query(v);
 });
 const submitFilter = () => {
-    console.log(JSON.stringify(filterForm));
     chipModal.value = false;
   var value = filter_select.value;
   obj = {};
