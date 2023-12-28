@@ -16,6 +16,8 @@ const props = defineProps({
   boardTitle: String,
 });
 // TODO: Move to composable useModal
+const snackbar_show = ref(false);
+const snackbar_msg = ref('');
 const isOpen = ref(false);
 const board_title = ref(props.boardTitle);
 const isDialogOpen = ref(false);
@@ -131,8 +133,7 @@ const query = async (_keyword) => {
     }
   }
 };
-
-watch(selectedColumn, (value) => {
+var handleSelectChange = function (value) {
   columnDisabled.value = true;
   if (value != null) {
     axios.post('/update-column', {
@@ -140,12 +141,31 @@ watch(selectedColumn, (value) => {
       column_id: value
     }).then((res) => {
       if (res.data.status == "success") {
+        snackbar_show.value = true;
+        snackbar_msg.value = "Task updated successfully";
         columnDisabled.value = false;
       }
     }).catch((error) => {
     })
   }
-});
+};
+
+// watch(selectedColumn, (value) => {
+//   columnDisabled.value = true;
+//   if (value != null) {
+//     axios.post('/update-column', {
+//       card_id: card_id.value,
+//       column_id: value
+//     }).then((res) => {
+//       if (res.data.status == "success") {
+//         snackbar_show.value = true;
+//         snackbar_msg.value = "Task updated successfully";
+//         columnDisabled.value = false;
+//       }
+//     }).catch((error) => {
+//     })
+//   }
+// });
 watch(select, (value) => {
   if (value !== null && typeof value === 'object') {
     axios.post('/assign-card', {
@@ -725,7 +745,7 @@ const showForm = async (cardContent) => {
           <v-col cols="4">
             <v-row>
               <v-col cols="6">
-                <v-select v-model="selectedColumn" :items="columns" item-title="title" item-value="id" density="compact"
+                <v-select v-model="selectedColumn"  @update:modelValue="handleSelectChange" :items="columns" item-title="title" item-value="id" density="compact"
                   variant="outlined" :disabled="columnDisabled"></v-select>
               </v-col>
             </v-row>
@@ -1209,4 +1229,9 @@ const showForm = async (cardContent) => {
     </v-card>
   </form>
   </v-dialog>
+  <template v-if="snackbar_show">
+      <v-snackbar v-model="snackbar_show" location="top right" :timeout="1000"  color="success">
+        {{ snackbar_msg }}
+      </v-snackbar>
+    </template>
 </template>

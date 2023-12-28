@@ -14,6 +14,7 @@ const headers = [
     { "title": "Start Date", "key": "start_date", "align": "left", sortable: false },
     { "title": "End Date", "key": "end_date", "align": "left", sortable: false },
     { "title": "Due Date", "key": "due_date", "align": "left", sortable: false },
+    { "title": "Status", "key": "due_date", "align": "left", sortable: false },
     { "title": "Asset IP", "key": "assetIP", "align": "left", sortable: false },
     { "title": "IP & Vuln Id", "key": "ipAndVulnId", "align": "left", sortable: false },
     { "title": "Port", "key": "port", "align": "left", sortable: false },
@@ -134,6 +135,7 @@ const chipModal = ref(false);
 var obj = {};
 const filterForm = useForm({
     project: '',
+    task_status: '',
     assignee: '',
     severity: '',
     domain: '',
@@ -359,6 +361,12 @@ function resetFilter(val) {
                                     moment(item.item.end_date).format('D MMM YY') }}</span><span v-else> - </span></td>
                                 <td><span v-if="moment(item.item.due_date).isValid()">{{
                                     moment(item.item.due_date).format('D MMM YY') }}</span><span v-else> - </span></td>
+                                    <td>
+                                        <span v-if="item.item.task_status != null">
+                                            <v-chip size="small" color="red">Overdue</v-chip>
+                                        </span>
+                                        <span v-else>-</span>
+                                    </td>
                                 <td><span v-if="item.item.asset_ip != ''">{{ truncatedString(item.item.asset_ip) }}</span>
                                 </td>
                                 <td><span v-if="item.item.ip_and_vuln_id != ''">{{ truncatedString(
@@ -448,6 +456,13 @@ function resetFilter(val) {
                                     <InputLabel for="name" value="Project" />
                                     <v-select variant="outlined" density="compact"  v-model="filterForm.project"
                                         :items="projectList" item-title="title" item-value="id"></v-select>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <div>
+                                    <InputLabel for="name" value="Task Status" />
+                                    <v-select variant="outlined" density="compact"  v-model="filterForm.task_status"
+                                        :items="['Overdue']"></v-select>
                                 </div>
                             </v-col>
                             <v-col cols="6">

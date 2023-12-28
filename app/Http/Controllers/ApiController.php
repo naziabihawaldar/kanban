@@ -8,7 +8,8 @@ use App\Models\User;
 use App\Models\Board;
 use App\Models\Card;
 use App\Models\Column;
-
+use App\Exports\ReportExport;
+use Maatwebsite\Excel\Facades\Excel;
 class ApiController extends Controller
 {
     public function login(Request $request)
@@ -39,6 +40,7 @@ class ApiController extends Controller
         }
     }
 
+    
     public function getProjects(Request $request)
     {
         try {
@@ -520,10 +522,15 @@ class ApiController extends Controller
     {
         try 
         {
+            $currentTimestamp = \Carbon\Carbon::now()->timestamp;
+            $filename = 'reports'.$currentTimestamp.'.xlsx';
+            $filepath = 'public/AppReports/'.$filename;
+            $fileurl = '/storage/AppReports/'.$filename;
             $board = Board::find($request->project_id);
             if($board)
             {
-                return ['status' => 'success', 'message' => 'success', 'download_link' => '/reports1703572600649.csv'];
+                Excel::store(new ReportExport($request), $filepath);
+                return ['status' => 'success', 'message' => 'success', 'download_link' => $fileurl];
             }
             return ['status' => 'error', 'message' => 'Project Not Found'];
         } catch (\Exception $e) {
