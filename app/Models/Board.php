@@ -24,6 +24,10 @@ class Board extends Model
     {
         return $this->hasMany(Column::class)->oldest();
     }
+    public function cards(): HasMany
+    {
+        return $this->hasMany(Card::class);
+    }
 
     public function addColumn(Column $column): void
     {

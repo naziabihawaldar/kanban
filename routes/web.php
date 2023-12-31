@@ -38,9 +38,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+
+    Route::get('/dashboard', [BoardController::class, 'dashboard'])->name('dashboard');
+    // Route::get('/dashboard', function () {
+    //     return Inertia::render('Dashboard');
+    // })->name('dashboard');
 
     Route::get('/boards/{board?}', [BoardController::class, 'show'])->name('boards');
     Route::post('/add-board', [BoardController::class, 'store'])->name('addBoard');

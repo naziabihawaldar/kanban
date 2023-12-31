@@ -10,6 +10,7 @@
   "require": {
     "php": "^8.1",
     "ahmedsaoud31/laravel-permission-to-vuejs": "dev-master",
+    "arielmejiadev/larapex-charts": "^6.0",
     "guzzlehttp/guzzle": "^7.2",
     "inertiajs/inertia-laravel": "^0.6.8",
     "laravel/framework": "^10.0",

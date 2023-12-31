@@ -6,7 +6,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import { Ziggy } from './ziggy';
-
+import VueApexCharts from "vue3-apexcharts";
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -43,7 +43,7 @@ createInertiaApp({
       .use(ZiggyVue, Ziggy)
       .use(vuetify)
       .use(LaravelPermissionToVueJS)
-      // .use(Vue3EasyDataTable)
+      .use(VueApexCharts)
       .mount(el);
   },
   progress: {

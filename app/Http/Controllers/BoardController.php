@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Charts\ProjectTaskChart;
+use App\Charts\OverdueTaskChart;
+use App\Charts\HorizontalChart;
+use App\Charts\DonutChart;
 use App\Http\Resources\BoardResource;
 use App\Models\Board;
 use App\Models\Card;
@@ -17,6 +21,21 @@ class BoardController extends Controller
     {
         $boards = Board::orderBy('created_at', 'desc')->get();
         return inertia("BoardList", compact("boards"));
+    }
+
+    public function dashboard(Request $request,ProjectTaskChart $barchart,OverdueTaskChart $pieChart,HorizontalChart $horizontalChart,DonutChart $donut)
+    {
+        $totalUsers =  User::count();
+        $totalProjects = Board::count();
+        $totalTask = Card::count();
+        $overdueTask = Card::whereNotNull('task_status')->count();
+        $barchart = $barchart->build();
+        $pieChart = $pieChart->build();
+        $horizontalChart = $horizontalChart->build();
+        $donutChart = $donut->build();
+        $projectList = Board::with('user')->latest()->take(5)->get();
+        $taskList = Card::with('board')->latest()->take(5)->get();
+        return inertia("Dashboard", compact("totalUsers","totalProjects","totalTask","overdueTask","barchart","pieChart","horizontalChart","donutChart","projectList","taskList")); 
     }
     public function show(Request $request, Board $board)
     {
