@@ -42,8 +42,8 @@ const showingNavigationDropdown = ref(false);
                 Projects
               </NavLink>
               <NavLink
-                :href="route('reports')"
-                :active="route().current('boards')"
+                :href="route('reports-list')"
+                :active="route().current('reports-list')"
               >
                 Reports
               </NavLink>

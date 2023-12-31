@@ -98,6 +98,8 @@ const Ziggy = {
     logout: { uri: 'logout', methods: ['POST'] },
     'user.logout': { uri: 'user/logout', methods: ['POST'] },
     reports: { uri: 'reports', methods: ['POST'] },
+    'reports-list': { uri: 'reports-list', methods: ['POST'] },
+    'consolidated-reports': { uri: 'consolidated-reports', methods: ['POST'] },
   },
 };
 

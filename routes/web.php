@@ -38,6 +38,13 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/reports-list', [ReportController::class, 'index'])->name('reports.list');
+    Route::get('/reports', [ReportController::class, 'detailedReport']);
+    Route::get('/consolidated-reports', [ReportController::class, 'consolidatedReport']);
+    Route::get('/get-reports', [ReportController::class, 'getReportsData']);
+    Route::post('/reports/export', [ReportController::class, 'export']);
+    Route::post('/consolidated-export', [ReportController::class, 'exportConsolidated']);
+
 
     Route::get('/dashboard', [BoardController::class, 'dashboard'])->name('dashboard');
     // Route::get('/dashboard', function () {
@@ -80,11 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/get-columns', [BoardController::class, 'getColumns']);
     Route::post('/get-activities', [CardController::class, 'getActivities']);
 
-    Route::get('/reports', [ReportController::class, 'index']);
-    Route::get('/get-reports', [ReportController::class, 'getReportsData']);
     
-    Route::post('/reports/export', [ReportController::class, 'export']);
-
     Route::post('/delete-file', [BoardController::class, 'deleteBulkFile']);
     Route::post('/update-column', [BoardController::class, 'updateColumn']);
     Route::post('/store-task', [CardController::class, 'storeTask']);
