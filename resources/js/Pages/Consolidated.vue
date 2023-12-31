@@ -116,7 +116,7 @@ const submitFilter = () => {
   }
 
   Object.keys(filterForm).forEach(function (key) {
-    console.log(key);
+    // console.log(key);
     if (key == 'project' && filterForm[key] != '') {
       Object.assign(obj, { Project: filterForm[key] });
     }
