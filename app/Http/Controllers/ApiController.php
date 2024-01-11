@@ -10,6 +10,7 @@ use App\Models\Card;
 use App\Models\Column;
 use App\Exports\ReportExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Activitylog\Models\Activity;
 class ApiController extends Controller
 {
     public function login(Request $request)
@@ -56,13 +57,13 @@ class ApiController extends Controller
     {
         try {
             $columns = Column::where('board_id', $request->board_id)->get();
-            foreach ($columns as $column) {
-                $cards = $column->cards()->with('users');
+            foreach ($columns as $column) 
+            {
+                $cards = $column->cards()->with('users','comments');
 
                 if ($request->has('searchtxt') && $request->searchtxt != '') {
                     $cards = $cards->where('content', 'like', '%' . $request->searchtxt . '%');
                 }
-
                 if ($request->has('severity') && $request->severity != '') {
                     $cards = $cards->where('severity', $request->severity);
                 }
@@ -96,6 +97,11 @@ class ApiController extends Controller
                 }
 
                 $cards = $cards->get();
+                foreach($cards as $card)
+                {
+                    $activities = Activity::where('subject_type', get_class($card))->get();
+                    $card->activities = $activities;
+                }
                 $column->cards = $cards;
             }
             return ['status' => 'success', 'data' => $columns];
@@ -246,46 +252,46 @@ class ApiController extends Controller
         $this->validate($request, [
             'board_id' => 'required',
             'card_id' => 'required',
-            'vulnerabilityName' => 'required',
-            'vulnerabilityID' => 'required',
-            'description' => 'required',
-            'vulnerabilityDetails' => 'required',
-            'ip_and_vuln_id' => 'required',
-            'port' => 'required',
-            'protocol' => 'required',
-            'os_type' => 'required',
-            'os_version' => 'required',
-            'business_unit' => 'required',
-            'class' => 'required',
-            'cve_id' => 'required',
-            'cvss_score' => 'required',
-            'severity' => 'required',
-            'solution' => 'required',
-            'impact_of_vulnerability' => 'required',
-            'scan_date_time' => 'required|date',
-            'background' => 'required',
-            'service' => 'required',
-            'remediation' => 'required',
-            'references' => 'required',
-            'exception' => 'required',
-            'tags' => 'required',
-            'asset_version' => 'required',
-            'model' => 'required',
-            'make' => 'required',
-            'asset_type' => 'required',
-            'host_name' => 'required',
-            'PLK_VLAN10_POS_SICOM_Subnet' => 'required',
-            'PLK_VLAN70_Kiosk_Subnet' => 'required',
-            'PLK_VLAN254_Meraki_Management_Subnet' => 'required',
-            'PLK_VLAN4_Subnet' => 'required',
-            'BK_VLAN10_POS_SICOM_Subnet' => 'required',
-            'BK_VLAN70_Kiosk_Subnet' => 'required',
-            'BK_VLAN254_Meraki_Management_Subnet' => 'required',
-            'BK_VLAN4_Subnet' => 'required',
-            'THS_VLAN10_POS_SICOM_Subnet' => 'required',
-            'THS_VLAN70_Kiosk_Subnet' => 'required',
-            'THS_VLAN254_Meraki_Management_Subnet' => 'required',
-            'THS_VLAN4_Subnet' => 'required',
+            // 'vulnerabilityName' => 'required',
+            // 'vulnerabilityID' => 'required',
+            // 'description' => 'required',
+            // 'vulnerabilityDetails' => 'required',
+            // 'ip_and_vuln_id' => 'required',
+            // 'port' => 'required',
+            // 'protocol' => 'required',
+            // 'os_type' => 'required',
+            // 'os_version' => 'required',
+            // 'business_unit' => 'required',
+            // 'class' => 'required',
+            // 'cve_id' => 'required',
+            // 'cvss_score' => 'required',
+            // 'severity' => 'required',
+            // 'solution' => 'required',
+            // 'impact_of_vulnerability' => 'required',
+            // 'scan_date_time' => 'required|date',
+            // 'background' => 'required',
+            // 'service' => 'required',
+            // 'remediation' => 'required',
+            // 'references' => 'required',
+            // 'exception' => 'required',
+            // 'tags' => 'required',
+            // 'asset_version' => 'required',
+            // 'model' => 'required',
+            // 'make' => 'required',
+            // 'asset_type' => 'required',
+            // 'host_name' => 'required',
+            // 'PLK_VLAN10_POS_SICOM_Subnet' => 'required',
+            // 'PLK_VLAN70_Kiosk_Subnet' => 'required',
+            // 'PLK_VLAN254_Meraki_Management_Subnet' => 'required',
+            // 'PLK_VLAN4_Subnet' => 'required',
+            // 'BK_VLAN10_POS_SICOM_Subnet' => 'required',
+            // 'BK_VLAN70_Kiosk_Subnet' => 'required',
+            // 'BK_VLAN254_Meraki_Management_Subnet' => 'required',
+            // 'BK_VLAN4_Subnet' => 'required',
+            // 'THS_VLAN10_POS_SICOM_Subnet' => 'required',
+            // 'THS_VLAN70_Kiosk_Subnet' => 'required',
+            // 'THS_VLAN254_Meraki_Management_Subnet' => 'required',
+            // 'THS_VLAN4_Subnet' => 'required',
         ]);
         try {
             $start_date = $end_date = $due_date = null;
@@ -531,6 +537,27 @@ class ApiController extends Controller
             {
                 Excel::store(new ReportExport($request), $filepath);
                 return ['status' => 'success', 'message' => 'success', 'download_link' => $fileurl];
+            }
+            return ['status' => 'error', 'message' => 'Project Not Found'];
+        } catch (\Exception $e) {
+            logger($e);
+            return ['status' => 'error', 'message' => 'Error Occurred'];
+        }
+    }
+
+    public function createColumn(Request $request)
+    {
+        try 
+        {
+            logger($request);
+            $board = Board::find($request->project_id);
+            if($board)
+            {
+                $column = new Column;
+                $column->title = $request->title;
+                $column->board_id = $board->id;
+                $column->save();
+                return ['status' => 'success', 'message' => 'success', 'data' => $column];
             }
             return ['status' => 'error', 'message' => 'Project Not Found'];
         } catch (\Exception $e) {

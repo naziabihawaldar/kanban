@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/store-task', [ApiController::class, 'storeTask']);   
     Route::post('/update-task', [ApiController::class, 'updateTask']);
     Route::post('/store-project', [ApiController::class, 'storeProject']);
+    Route::post('/create-column', [ApiController::class, 'createColumn']);
     Route::post('/update-column', [ApiController::class, 'updateColumn']);
     Route::get('/get-project-assignees', [ApiController::class, 'getProjectAssignees']);
     Route::get('/get-reports', [ApiController::class, 'getReports']);
